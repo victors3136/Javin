@@ -44,8 +44,7 @@ public class Application {
                             "print(b)");
             example2 = muncher.eatStringCreateProgram(
                     "str b;" +
-                            "b<-\"b\";" +
-                            "str bb;" +
+                            "b<-\"b\";" +                            "str bb;" +
                             "bb<-b+b;" +
                             "str b3;" +
                             "b3<-bb+b;" +

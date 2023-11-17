@@ -63,7 +63,7 @@ public class ReadFileStatement implements Statement {
 
     @Override
     public String toString() {
-        return "fread( " + this.filenameExpression.toString() + " " + this.identifier + ") ";
+        return "fread( " + this.filenameExpression.toString() + " " + this.identifier + " )";
     }
 
     @Override

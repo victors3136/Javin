@@ -20,7 +20,7 @@ public class CloseFileStatement implements Statement {
 
     @Override
     public String toString(){
-        return "fclose ( "+this.filenameExpression.toString()+" )";
+        return "fclose( "+this.filenameExpression.toString()+" )";
     }
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {

@@ -1,5 +1,7 @@
 package interpreter.model.statements;
+
 import interpreter.model.expressions.Expression;
+import interpreter.model.expressions.VariableExpression;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.types.Type;
@@ -22,22 +24,25 @@ public class AssignStatement implements Statement {
     @Override
     public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, StatementException, SymbolTableException {
         SymbolTable<String, Value> dictionary = state.getSymbolTable();
-        if(dictionary==null)
+        if (dictionary == null)
             return state;
-        Value valueOfExpression = expressionAssignedToVar.evaluate(dictionary);
-        Type variablePreassignedType = dictionary.lookup(variableIdentifier).getType();
-        if ( ! valueOfExpression.isOfType(variablePreassignedType))
-            throw new StatementException("Unmatched value-type combination -- " + valueOfExpression + " and " + variablePreassignedType );
-        dictionary.update(variableIdentifier, valueOfExpression);
+        Value rightHandSide = expressionAssignedToVar.evaluate(dictionary);
+        Value leftHandSide = dictionary.lookup(variableIdentifier);
+        if (leftHandSide == null)
+            throw new StatementException("Implicit declaration of a variable -- " + variableIdentifier);
+        Type variablePreassignedType = leftHandSide.getType();
+        if (!rightHandSide.isOfType(variablePreassignedType))
+            throw new StatementException("Unmatched value-type combination -- " + rightHandSide + " and " + variablePreassignedType);
+        dictionary.update(variableIdentifier, rightHandSide);
         return state;
     }
 
     @Override
     public Statement deepCopy() throws ExpressionException {
-        return new AssignStatement(new String(variableIdentifier), expressionAssignedToVar.deepCopy());
+        return new AssignStatement(variableIdentifier, expressionAssignedToVar.deepCopy());
     }
 
-    public String toString(){
+    public String toString() {
         return variableIdentifier + " <- " + expressionAssignedToVar.toString();
     }
 }
