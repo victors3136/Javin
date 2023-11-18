@@ -1,6 +1,7 @@
 package interpreter.model.values;
 
 import interpreter.model.exceptions.ValueException;
+import interpreter.model.type.IntType;
 import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Numeric;
@@ -27,7 +28,7 @@ public class IntValue implements Value, Numeric<Value>, Additive<Value>, Testabl
 
     @Override
     public Type getType() {
-        return new Type(IntValue.class);
+        return IntType.get();
     }
 
     @Override

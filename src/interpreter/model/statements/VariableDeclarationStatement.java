@@ -23,7 +23,7 @@ public class VariableDeclarationStatement implements Statement {
         SymbolTable<String, Value> st = state.getSymbolTable();
         if(st.lookup(identifier) != null)
             throw new StatementException("Redeclaration of a variable");
-        st.put(identifier, type.instantiateDefault());
+        st.put(identifier, type.getDefault());
         return state;
     }
 

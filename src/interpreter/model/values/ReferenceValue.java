@@ -9,7 +9,7 @@ public class ReferenceValue implements Value, Testable<Value>{
     Type inner;
     @Override
     public Type getType() {
-        return new ReferenceType(inner);
+        return this.inner;
     }
 
     @Override

@@ -1,22 +1,13 @@
 package interpreter.model.type;
 
+
 import interpreter.model.values.Value;
-public class Type {
-    private final Class<? extends Value> valueClass;
 
-    public Type(Class<? extends Value> valueClass) {
-        this.valueClass = valueClass;
-    }
+public sealed interface Type permits BoolType, IntType, ReferenceType, StringType {
+    boolean equals(Type other);
+    Value getDefault();
+    String toString();
+    TypeToken getToken();
 
-    public String toString() {
-        return valueClass.toString();
-    }
-
-    public boolean equals(Class<? extends Value> other) {
-        return other.isAssignableFrom(valueClass);
-    }
-
-    public Type deepCopy() {
-        return new Type(valueClass);
-    }
+    Type deepCopy();
 }

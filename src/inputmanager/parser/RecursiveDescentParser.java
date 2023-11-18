@@ -10,6 +10,9 @@ import interpreter.model.statements.filestatements.CloseFileStatement;
 import interpreter.model.statements.filestatements.OpenReadFileStatement;
 import interpreter.model.statements.filestatements.ReadFileStatement;
 import interpreter.model.exceptions.ExpressionException;
+import interpreter.model.type.BoolType;
+import interpreter.model.type.IntType;
+import interpreter.model.type.StringType;
 import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
@@ -69,9 +72,9 @@ public class RecursiveDescentParser implements Parser {
                 Token previousToken = this.lookahead;
                 moveToNext();
                 return new VariableDeclarationStatement(switch (previousToken.getType()) {
-                    case TYPE_BOOL -> new Type(BoolValue.class);
-                    case TYPE_INT -> new Type(IntValue.class);
-                    case TYPE_STR -> new Type(StringValue.class);
+                    case TYPE_BOOL -> BoolType.get();
+                    case TYPE_INT -> IntType.get();
+                    case TYPE_STR -> StringType.get();
                     default -> null;
                 },
                         getIdentifier());

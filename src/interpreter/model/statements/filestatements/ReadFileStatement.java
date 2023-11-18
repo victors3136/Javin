@@ -5,6 +5,7 @@ import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.*;
+import interpreter.model.type.IntType;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
 import interpreter.model.values.StringValue;
@@ -40,9 +41,9 @@ public class ReadFileStatement implements Statement {
             throw new StatementException(e.getMessage() + " -- Reading error -- " + stringValue.getValue());
         }
         if (processed.isEmpty()) {
-            symbolTable.update(this.identifier, symbolTable.lookup(this.identifier).getType().instantiateDefault());
+            symbolTable.update(this.identifier, symbolTable.lookup(this.identifier).getType().getDefault());
         } else {
-            switch (symbolTable.lookup(this.identifier).getType()) {
+            switch (symbolTable.lookup(this.identifier).getType().getToken()) {
                 case BOOLEAN -> {
                     symbolTable.update(this.identifier, new BoolValue(Boolean.parseBoolean(processed)));
                 }

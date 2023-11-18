@@ -1,6 +1,7 @@
 package interpreter.model.values;
 
 import interpreter.model.exceptions.ValueException;
+import interpreter.model.type.IntType;
 import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Testable;
@@ -10,14 +11,17 @@ import java.util.Objects;
 public class StringValue implements Value, Additive<Value>, Comparable<Value>, Testable<Value> {
     String value;
     public StringValue(String value) {
-        StringBuilder buffer = new StringBuilder(value);
-        if(buffer.charAt(0)=='\"'){
-            buffer.deleteCharAt(0);
-        }
-        if(buffer.charAt(buffer.length()-1)=='\"'){
-            buffer.deleteCharAt(buffer.length()-1);
-        }
-        this.value = buffer.toString();
+        if(!value.isEmpty()) {
+            StringBuilder buffer = new StringBuilder(value);
+
+            if (buffer.charAt(0) == '\"') {
+                buffer.deleteCharAt(0);
+            }
+            if (buffer.charAt(buffer.length() - 1) == '\"') {
+                buffer.deleteCharAt(buffer.length() - 1);
+            }
+            this.value = buffer.toString();
+        }else this.value = value;
     }
     public StringValue() {
         this.value = "";
@@ -28,7 +32,7 @@ public class StringValue implements Value, Additive<Value>, Comparable<Value>, T
     }
     @Override
     public Type getType(){
-        return new Type(IntValue.class);
+        return IntType.get();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class CloseFileStatement implements Statement {
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {
         Value value = filenameExpression.evaluate(state.getSymbolTable());
         if(!(value instanceof StringValue))
-            throw new StatementException("Files are identified by strings -- provided "+value.getType().toString());
+            throw new StatementException("Files are identified by strings -- provided "+value.getType());
         String fileIdentifier = ((StringValue) value).getValue();
         FileTable fileTable = state.getFileTable();
         try {

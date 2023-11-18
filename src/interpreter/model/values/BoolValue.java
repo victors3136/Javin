@@ -1,5 +1,6 @@
 package interpreter.model.values;
 
+import interpreter.model.type.BoolType;
 import interpreter.model.type.Type;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.operationinterfaces.Logical;
@@ -25,7 +26,7 @@ public class BoolValue implements Value, Testable<Value>, Logical {
 
     @Override
     public Type getType() {
-        return new Type(BoolValue.class);
+        return BoolType.get();
     }
 
     @Override
