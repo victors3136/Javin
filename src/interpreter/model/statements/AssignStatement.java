@@ -1,14 +1,13 @@
 package interpreter.model.statements;
 
 import interpreter.model.expressions.Expression;
-import interpreter.model.expressions.VariableExpression;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.StatementException;
 import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.exceptions.ValueException;
+import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 
 public class AssignStatement implements Statement {
@@ -31,7 +30,7 @@ public class AssignStatement implements Statement {
         if (leftHandSide == null)
             throw new StatementException("Implicit declaration of a variable -- " + variableIdentifier);
         Type variablePreassignedType = leftHandSide.getType();
-        if (!rightHandSide.isOfType(variablePreassignedType))
+        if (!rightHandSide.getType().equals(variablePreassignedType))
             throw new StatementException("Unmatched value-type combination -- " + rightHandSide + " and " + variablePreassignedType);
         dictionary.update(variableIdentifier, rightHandSide);
         return state;

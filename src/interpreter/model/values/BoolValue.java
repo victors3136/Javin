@@ -1,9 +1,11 @@
 package interpreter.model.values;
 
-import interpreter.model.types.Type;
+import interpreter.model.type.Type;
 import interpreter.model.exceptions.ValueException;
+import interpreter.model.values.operationinterfaces.Logical;
+import interpreter.model.values.operationinterfaces.Testable;
 
-public class BoolValue extends Value{
+public class BoolValue implements Value, Testable<Value>, Logical {
 
     boolean value;
 
@@ -17,40 +19,22 @@ public class BoolValue extends Value{
         value = b;
     }
 
-    public boolean getValue(){
+    public boolean getValue() {
         return value;
     }
 
     @Override
     public Type getType() {
-        return Type.BOOLEAN;
+        return new Type(BoolValue.class);
     }
 
     @Override
-    public boolean isOfType(Type t) {
-        return t == Type.BOOLEAN;
-    }
-
-    @Override
-    public String toString(){
+    public String toString() {
         return Boolean.toString(value);
     }
-    public boolean isTrue(){
+
+    public boolean isTrue() {
         return value;
-    }
-
-    @Override
-    public Value equal(Value other) throws ValueException {
-        if(! (other instanceof BoolValue))
-            throw new ValueException("Cannot test boolean for equality with an instance of a different type -- provided "+ other.getType());
-        return new BoolValue(this.value == ((BoolValue) other).value );
-    }
-
-    @Override
-    public Value notEqual(Value other) throws ValueException {
-        if(! (other instanceof BoolValue))
-            throw new ValueException("Cannot test boolean for equality with an instance of a different type -- provided "+ other.getType());
-        return new BoolValue(this.value != ((BoolValue) other).value );
     }
 
     @Override
@@ -59,16 +43,34 @@ public class BoolValue extends Value{
     }
 
     @Override
-    public Value or(Value other) throws ValueException {
-        if(! (other instanceof BoolValue))
-            throw new ValueException("Cannot execute a logical 'OR' on a non-boolean type-- provided "+ other.getType());
-        return new BoolValue(this.value || ((BoolValue) other).value );
+    public BoolValue or(Value other) throws ValueException {
+        if (other instanceof BoolValue boolOther)
+            return new BoolValue(this.value || boolOther.value);
+        throw new ValueException("Cannot execute a logical 'AND' on a non-boolean type-- provided " + other.getType());
+
     }
 
     @Override
-    public Value and(Value other) throws ValueException {
-        if(! (other instanceof BoolValue))
-            throw new ValueException("Cannot execute a logical 'AND' on a non-boolean type-- provided "+ other.getType());
-        return new BoolValue(this.value && ((BoolValue) other).value );
+    public BoolValue and(Value other) throws ValueException {
+        if (other instanceof BoolValue boolOther)
+            return new BoolValue(this.value && boolOther.value);
+        throw new ValueException("Cannot execute a logical 'AND' on a non-boolean type-- provided " + other.getType());
+    }
+
+    @Override
+    public BoolValue not() {
+        return new BoolValue(!this.value);
+    }
+
+    @Override
+    public BoolValue equal(Value other) throws ValueException {
+        if (other instanceof BoolValue boolOther)
+            return new BoolValue(this.value == boolOther.value);
+        throw new ValueException("Cannot test for equality between different types -- provided %s".formatted(other.getType()));
+    }
+
+    @Override
+    public BoolValue notEqual(Value other) throws ValueException {
+        return new BoolValue(!(this.equal(other).value));
     }
 }

@@ -5,14 +5,15 @@ import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
+import interpreter.model.values.operationinterfaces.Comparable;
 
-public class RelationalExpression implements Expression{
+public class RelationalExpression implements Expression {
     Expression firstExpression, secondExpression;
     Operand operand;
 
     public RelationalExpression(Expression firstExpression, Expression secondExpression, Operand operand) throws ExpressionException {
         super();
-        if(!operand.relational()){
+        if (!operand.relational()) {
             throw new ExpressionException("Operand is not fit for a relational expression");
         }
         this.firstExpression = firstExpression;
@@ -20,9 +21,10 @@ public class RelationalExpression implements Expression{
         this.operand = operand;
 
     }
+
     public RelationalExpression(Operand operand, Expression firstExpression, Expression secondExpression) throws ExpressionException {
         super();
-        if(!operand.relational()){
+        if (!operand.relational()) {
             throw new ExpressionException("Operand is not fit for a relational expression");
         }
         this.operand = operand;
@@ -30,32 +32,34 @@ public class RelationalExpression implements Expression{
         this.secondExpression = secondExpression;
 
     }
+
+    @SuppressWarnings({"rawtypes"})
     @Override
-    public Value evaluate(SymbolTable<String, Value>  symbolTable) throws ExpressionException, ValueException {
+    public Value evaluate(SymbolTable<String, Value> symbolTable) throws ExpressionException, ValueException {
         Value firstValue = firstExpression.evaluate(symbolTable);
-        if(!firstValue.getType().isSuitableFor(operand)){
-            throw new ExpressionException("First expression does not evaluate to a value of type suitable for the provided operand -- "+ firstExpression.toString() + ", operand "+ operand.toString());
+        if (firstValue instanceof Comparable cast) {
+            Value secondValue = secondExpression.evaluate(symbolTable);
+            return switch (operand) {
+                case EQUAL -> cast.equal(secondValue);
+                case NOT_EQUAL -> cast.notEqual(secondValue);
+                case GREATER -> cast.greater(secondValue);
+                case LOWER -> cast.lower(secondValue);
+                case GREATER_OR_EQUAL -> cast.greaterOrEqual(secondValue);
+                case LOWER_OR_EQUAL -> cast.lowerOrEqual(secondValue);
+                default -> throw new ExpressionException("Operand provided is not suitable for a logical expression");
+            };
+        } else {
+            throw new ExpressionException("First expression does not evaluate to a value of type suitable for the provided operand -- %s, operand %s".
+                    formatted(firstExpression.toString(), operand.toString()));
         }
-        Value secondValue = secondExpression.evaluate(symbolTable);
-        if(!firstValue.isOfType(secondValue.getType()))
-            throw new ExpressionException("The two expressions do not evaluate to the same type -- " +firstValue.getType()+", "+ secondValue.getType());
-        return switch(operand){
-            case EQUAL-> firstValue.equal(secondValue);
-            case NOT_EQUAL -> firstValue.notEqual(secondValue);
-            case GREATER -> firstValue.greater(secondValue);
-            case LOWER -> firstValue.lower(secondValue);
-            case GREATER_OR_EQUAL -> firstValue.greaterOrEqual(secondValue);
-            case LOWER_OR_EQUAL -> firstValue.lowerOrEqual(secondValue);
-            default -> throw new ExpressionException("Operand provided is not suitable for a logical expression");
-        };
     }
 
     @Override
     public Expression deepCopy() throws ExpressionException {
-        return new RelationalExpression(firstExpression.deepCopy(),secondExpression.deepCopy(),operand.deepCopy());
+        return new RelationalExpression(firstExpression.deepCopy(), secondExpression.deepCopy(), operand.deepCopy());
     }
 
-    public String toString(){
-        return "(" + firstExpression.toString() + " " + operand.toString() + " " + secondExpression.toString()+ ")";
+    public String toString() {
+        return "(" + firstExpression.toString() + " " + operand.toString() + " " + secondExpression.toString() + ")";
     }
 }

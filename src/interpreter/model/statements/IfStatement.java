@@ -2,7 +2,6 @@ package interpreter.model.statements;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.BoolValue;
@@ -23,7 +22,7 @@ public class IfStatement implements Statement {
         if(stack==null)
             return state;
         Value conditionValue = condition.evaluate(state.getSymbolTable());
-        if(!conditionValue.isOfType(Type.BOOLEAN))
+        if(!(conditionValue instanceof BoolValue))
             throw new StatementException("Conditional statement does not evaluate to a boolean ");
         if(((BoolValue)conditionValue).isTrue())
             stack.push(branchPositive);

@@ -4,7 +4,6 @@ import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
 import interpreter.model.symboltable.SymbolTable;
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.*;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
@@ -30,9 +29,8 @@ public class ReadFileStatement implements Statement {
             throw new StatementException("Unknown identifier -- " + this.identifier);
         }
         Value value = filenameExpression.evaluate(symbolTable);
-        if (!value.isOfType(Type.STRING))
+        if (!(value instanceof StringValue stringValue))
             throw new StatementException("File must be referenced through a string name -- got a(n) " + value.getType().toString());
-        StringValue stringValue = (StringValue) value;
         BufferedReader reader = state.getFileTable().lookup(stringValue.getValue());
         String readString, processed;
         try {

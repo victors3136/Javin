@@ -1,13 +1,13 @@
 package interpreter.model.values;
 
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.ValueException;
-
+import interpreter.model.type.Type;
+import interpreter.model.values.operationinterfaces.Additive;
+import interpreter.model.values.operationinterfaces.Testable;
+import interpreter.model.values.operationinterfaces.Comparable;
 import java.util.Objects;
 
-import static interpreter.model.types.Type.STRING;
-
-public class StringValue extends Value {
+public class StringValue implements Value, Additive<Value>, Comparable<Value>, Testable<Value> {
     String value;
     public StringValue(String value) {
         StringBuilder buffer = new StringBuilder(value);
@@ -28,11 +28,7 @@ public class StringValue extends Value {
     }
     @Override
     public Type getType(){
-        return STRING;
-    }
-    @Override
-    public boolean isOfType(Type t) {
-        return t==STRING;
+        return new Type(IntValue.class);
     }
 
     @Override
@@ -42,51 +38,60 @@ public class StringValue extends Value {
 
     @Override
     public Value add(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Addition between string must feature 2 strings -- provided " + other.getType());
-        return new StringValue(this.value + ((StringValue) other).value);
+        if (other instanceof StringValue stringValue) {
+            return new StringValue(this.value + stringValue.value);
+        }
+        throw new ValueException("Addition between strings must feature two strings -- provided " + other.getType());
     }
 
     @Override
-    public Value equal(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Cannot test string for equality with an instance of a different type -- provided " + other.getType());
-        return new BoolValue(Objects.equals(this.value, ((StringValue) other).value));
+    public BoolValue equal(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(Objects.equals(this.value, stringValue.value));
+        }
+        throw new ValueException("Cannot test string for equality with an instance of a different type -- provided " + other.getType());
     }
 
     @Override
-    public Value notEqual(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Cannot test string for equality with an instance of a different type -- provided " + other.getType());
-        return new BoolValue(! Objects.equals(this.value, ((StringValue) other).value));
-    }
-    @Override
-    public Value greater(Value other) throws ValueException {
-            if (!(other instanceof StringValue))
-                throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
-            return new BoolValue(this.value.compareTo(((StringValue) other).value) > 0);
+    public BoolValue notEqual(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(!Objects.equals(this.value, stringValue.value));
+        }
+        throw new ValueException("Cannot test string for inequality with an instance of a different type -- provided " + other.getType());
     }
 
     @Override
-    public Value lower(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
-        return new BoolValue(this.value.compareTo(((StringValue) other).value) < 0);
+    public BoolValue greater(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(this.value.compareTo(stringValue.value) > 0);
+        }
+        throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
     }
 
     @Override
-    public Value greaterOrEqual(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
-        return new BoolValue(this.value.compareTo(((StringValue) other).value) >= 0);
+    public BoolValue lower(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(this.value.compareTo(stringValue.value) < 0);
+        }
+        throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
     }
 
     @Override
-    public Value lowerOrEqual(Value other) throws ValueException {
-        if (!(other instanceof StringValue))
-            throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
-        return new BoolValue(this.value.compareTo(((StringValue) other).value) <= 0);
+    public BoolValue greaterOrEqual(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(this.value.compareTo(stringValue.value) >= 0);
+        }
+        throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
     }
+
+    @Override
+    public BoolValue lowerOrEqual(Value other) throws ValueException {
+        if (other instanceof StringValue stringValue) {
+            return new BoolValue(this.value.compareTo(stringValue.value) <= 0);
+        }
+        throw new ValueException("Cannot compare string with an instance of a different type -- provided " + other.getType());
+    }
+
 
     @Override
     public Value deepCopy() {

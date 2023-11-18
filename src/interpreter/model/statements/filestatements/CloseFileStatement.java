@@ -4,7 +4,6 @@ import interpreter.model.expressions.Expression;
 import interpreter.model.filetable.FileTable;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.*;
 import interpreter.model.values.StringValue;
 import interpreter.model.values.Value;
@@ -25,7 +24,7 @@ public class CloseFileStatement implements Statement {
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {
         Value value = filenameExpression.evaluate(state.getSymbolTable());
-        if(!value.isOfType(Type.STRING))
+        if(!(value instanceof StringValue))
             throw new StatementException("Files are identified by strings -- provided "+value.getType().toString());
         String fileIdentifier = ((StringValue) value).getValue();
         FileTable fileTable = state.getFileTable();

@@ -4,7 +4,6 @@ import interpreter.model.expressions.Expression;
 import interpreter.model.filetable.FileTable;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
-import interpreter.model.types.Type;
 import interpreter.model.exceptions.*;
 import interpreter.model.values.StringValue;
 import interpreter.model.values.Value;
@@ -28,9 +27,8 @@ public class OpenReadFileStatement implements Statement {
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {
         FileTable fileTable = state.getFileTable();
         Value value = filenameExpression.evaluate(state.getSymbolTable());
-        if(!value.isOfType(Type.STRING))
+        if(!(value instanceof StringValue string))
             throw new StatementException("Argument given to an OpenReadFileStatement must evaluate to a string");
-        StringValue string = (StringValue) value;
         if(fileTable.lookup(string.getValue())!=null){
             throw new StatementException("Trying to open a file which was already opened before -- "+ string.getValue());
         }
