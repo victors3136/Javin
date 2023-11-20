@@ -91,7 +91,8 @@ public class RecursiveDescentParser implements Parser {
                 moveToNext();
                 return new CloseFileStatement(buildExpression());
             }
-            default -> throw new ParseException("Invalid token for Statement -- " + lookahead.getSequence());
+            default ->
+                    throw new ParseException("Invalid token for Statement -- " + lookahead.getSequence() + " " + lookahead.getType());
         }
     }
 

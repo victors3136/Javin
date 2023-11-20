@@ -1,11 +1,16 @@
 package interpreter.model.expressions;
 
+import interpreter.model.exceptions.HeapException;
 import interpreter.model.operands.Operand;
+import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
+import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Numeric;
+
+import static interpreter.model.operands.Operand.ADD;
 
 public class ArithmeticExpression implements Expression {
     Expression firstExpression, secondExpression;
@@ -29,21 +34,26 @@ public class ArithmeticExpression implements Expression {
         this.secondExpression = secondExpression;
     }
 
-    @SuppressWarnings("rawtypes")
+
     @Override
-    public Value evaluate(SymbolTable<String, Value> symbolTable) throws ExpressionException, ValueException {
-        Value firstValue = firstExpression.evaluate(symbolTable);
-        if (firstValue instanceof Numeric cast) {
-            Value secondValue = secondExpression.evaluate(symbolTable);
+    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException {
+        Value firstValue = firstExpression.evaluate(state);
+
+        if (operand == ADD && firstValue instanceof Additive additiveCast) {
+            Value secondValue = secondExpression.evaluate(state);
+            return (Value) additiveCast.add(secondValue);
+        }
+        if (firstValue instanceof Numeric numericCast) {
+            Value secondValue = secondExpression.evaluate(state);
             return switch (operand) {
-                case ADD -> (Value) cast.add(secondValue);
-                case SUB -> (Value) cast.sub(secondValue);
-                case MUL -> (Value) cast.mul(secondValue);
-                case DIV -> (Value) cast.div(secondValue);
-                case EXP -> (Value) cast.exp(secondValue);
+                case SUB -> (Value) numericCast.sub(secondValue);
+                case MUL -> (Value) numericCast.mul(secondValue);
+                case DIV -> (Value) numericCast.div(secondValue);
+                case EXP -> (Value) numericCast.exp(secondValue);
                 default -> throw new ExpressionException("Unaccepted operand type");
             };
-        }else throw new ExpressionException("First expression does not evaluate to a value suitable for the provided operand --" + firstExpression.toString() + ", operand " + operand.toString());
+        } else
+            throw new ExpressionException("First expression does not evaluate to a value suitable for the provided operand --" + firstExpression.toString() + ", operand " + operand.toString());
     }
 
     @Override

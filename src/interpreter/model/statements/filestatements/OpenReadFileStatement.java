@@ -24,9 +24,9 @@ public class OpenReadFileStatement implements Statement {
         return "fopen( "+this.filenameExpression.toString()+" )";
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
         FileTable fileTable = state.getFileTable();
-        Value value = filenameExpression.evaluate(state.getSymbolTable());
+        Value value = filenameExpression.evaluate(state);
         if(!(value instanceof StringValue string))
             throw new StatementException("Argument given to an OpenReadFileStatement must evaluate to a string");
         if(fileTable.lookup(string.getValue())!=null){

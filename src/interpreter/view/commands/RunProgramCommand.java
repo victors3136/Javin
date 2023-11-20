@@ -19,8 +19,8 @@ public class RunProgramCommand extends Command {
         try {
             controller.takeAllSteps();
         } catch (RepositoryException | SymbolTableException | ControllerException | StatementException |
-                 ValueException | ExpressionException | TypeException e) {
-            System.out.println(e.getMessage());
+                 ValueException | ExpressionException | TypeException | HeapException e) {
+            System.err.println(e.getMessage());
         }
     }
 }

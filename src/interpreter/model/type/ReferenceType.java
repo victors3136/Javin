@@ -1,5 +1,6 @@
 package interpreter.model.type;
 
+import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ public non-sealed class ReferenceType implements Type{
     static Map<Type,ReferenceType> instances;
 
     private ReferenceType(Type t){ inner = t; }
-    public Type get(Type t){
+    static public Type get(Type t){
         if(instances.get(t)== null){
             instances.put(t, new ReferenceType(t));
         }
@@ -27,10 +28,8 @@ public non-sealed class ReferenceType implements Type{
 
     @Override
     public Value getDefault() {
-        /// TODO
-        return null;
+        return new ReferenceValue(0, inner);
     }
-
     @Override
     public TypeToken getToken() {
         return TypeToken.REFERENCE;

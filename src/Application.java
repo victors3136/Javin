@@ -42,6 +42,7 @@ public class Application {
                             "else" +
                             "(b<-\"order of operation is not respected\"));" +
                             "print(b)");
+            System.out.println("1");
             example2 = muncher.eatStringCreateProgram(
                     "str b;" +
                             "b<-\"b\";" +                            "str bb;" +
@@ -49,6 +50,7 @@ public class Application {
                             "str b3;" +
                             "b3<-bb+b;" +
                             "print(b3)");
+            System.out.println("2");
             example3 = muncher.eatStringCreateProgram(
                     "fopen(\"in.txt\");" +
                             "fopen(\"in2.txt\");" +
@@ -59,19 +61,20 @@ public class Application {
                             "print(a);" +
                             "fclose(\"in.txt\");" +
                             "fclose(\"in2.txt\")");
+            System.out.println("3");
             example4 = muncher.eatStringCreateProgram(readInput());
         } catch (TokenizerException | ParseException | ExpressionException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             System.exit(1);
         }
         ProgramState programState1 = new ProgramStateImplementation(example1);
         ProgramState programState2 = new ProgramStateImplementation(example2);
         ProgramState programState3 = new ProgramStateImplementation(example3);
         ProgramState programState4 = new ProgramStateImplementation(example4);
-        Repository repositoryVector1 = new RepositoryVector("log1.txt");
-        Repository repositoryVector2 = new RepositoryVector("log2.txt");
-        Repository repositoryVector3 = new RepositoryVector("log3.txt");
-        Repository repositoryVector4 = new RepositoryVector("log4.txt");
+        Repository repositoryVector1 = new RepositoryVector("logs/log1.txt");
+        Repository repositoryVector2 = new RepositoryVector("logs/log2.txt");
+        Repository repositoryVector3 = new RepositoryVector("logs/log3.txt");
+        Repository repositoryVector4 = new RepositoryVector("logs/log4.txt");
         Controller controller1 = new ControllerImplementation(programState1, repositoryVector1);
         Controller controller2 = new ControllerImplementation(programState2, repositoryVector2);
         Controller controller3 = new ControllerImplementation(programState3, repositoryVector3);

@@ -4,6 +4,7 @@ public enum TokenType {
     TYPE_BOOL,
     TYPE_INT,
     TYPE_STR,
+    TYPE_REF,
     CONST_BOOLEAN,
     CONST_INTEGER,
     CONST_STRING,
@@ -31,6 +32,7 @@ public enum TokenType {
             case TYPE_BOOL -> "bool";
             case TYPE_INT -> "int";
             case TYPE_STR -> "str";
+            case TYPE_REF -> "ref";
             case CONST_BOOLEAN -> "boolean_constant";
             case CONST_INTEGER -> "integer_constant";
             case CONST_STRING -> "string_constant";
@@ -56,15 +58,16 @@ public enum TokenType {
 
     public String toRegex() {
         return switch (this) {
-            case TYPE_BOOL -> "^bool";
-            case TYPE_INT -> "^int";
-            case TYPE_STR -> "^str";
-            case CONST_BOOLEAN -> "^(true|false)";
+            case TYPE_BOOL -> "^bool\\b";
+            case TYPE_INT -> "^int\\b";
+            case TYPE_STR -> "^str\\b";
+            case TYPE_REF -> "^ref\\b";
+            case CONST_BOOLEAN -> "^(true|false)\\b";
             case CONST_INTEGER -> "^(-)?(0|([1-9][0-9]*))";
             case CONST_STRING -> "^\"[^\"]*\"";
-            case KEYWORD_IF -> "^if";
-            case KEYWORD_BRANCH -> "^else";
-            case KEYWORD_PRINT -> "^print";
+            case KEYWORD_IF -> "^if\\b";
+            case KEYWORD_BRANCH -> "^else\\b";
+            case KEYWORD_PRINT -> "^print\\b";
             case EXP_OP -> "^(\\^)";
             case MUL_DIV_OP -> "^((\\*)|(/))";
             case ADD_SUB_OP -> "^((\\+)|(-))";
@@ -74,9 +77,9 @@ public enum TokenType {
             case OPEN_PARENTHESIS -> "^(\\()";
             case CLOSED_PARENTHESIS -> "^(\\))";
             case KEYWORD_COMPOUND -> "^;";
-            case KEYWORD_OPEN_FILE -> "^fopen";
-            case KEYWORD_READ_FILE -> "^fread";
-            case KEYWORD_CLOSE_FILE -> "^fclose";
+            case KEYWORD_OPEN_FILE -> "^fopen\\b";
+            case KEYWORD_READ_FILE -> "^fread\\b";
+            case KEYWORD_CLOSE_FILE -> "^fclose\\b";
             case IDENTIFIER -> "^[a-zA-Z_][a-zA-Z_0-9]*";
             case EMPTY -> "^$";
         };

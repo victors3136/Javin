@@ -34,10 +34,11 @@ public class TextMenu {
             }
             Command currentCommand = commands.get(key);
             if(currentCommand == null) {
-                System.out.println("Try again");
+                System.err.println("Try again");
                 continue;
             }
             currentCommand.execute();
+            commands.remove(key, currentCommand);
             System.out.print("Press 'enter' to continue ...");
             stdin.nextLine();
         }

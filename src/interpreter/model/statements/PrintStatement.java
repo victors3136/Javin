@@ -1,4 +1,5 @@
 package interpreter.model.statements;
+import interpreter.model.exceptions.HeapException;
 import interpreter.model.outputlist.OutputList;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ExpressionException;
@@ -12,11 +13,11 @@ public class PrintStatement implements Statement {
         this.expressionToPrint = expressionToPrint;
     }
     @Override
-    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException {
+    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, HeapException {
         OutputList<Value> outputList  = state.getOutputList();
         if(outputList == null)
             return state;
-        outputList.append(expressionToPrint.evaluate(state.getSymbolTable()));
+        outputList.append(expressionToPrint.evaluate(state));
         return state;
     }
 

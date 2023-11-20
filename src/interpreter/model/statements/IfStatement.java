@@ -1,4 +1,5 @@
 package interpreter.model.statements;
+import interpreter.model.exceptions.HeapException;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
@@ -17,11 +18,11 @@ public class IfStatement implements Statement {
         this.branchNegative = branchNegative;
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException {
         ExecutionStack<Statement> stack = state.getExecutionStack();
         if(stack==null)
             return state;
-        Value conditionValue = condition.evaluate(state.getSymbolTable());
+        Value conditionValue = condition.evaluate(state);
         if(!(conditionValue instanceof BoolValue))
             throw new StatementException("Conditional statement does not evaluate to a boolean ");
         if(((BoolValue)conditionValue).isTrue())

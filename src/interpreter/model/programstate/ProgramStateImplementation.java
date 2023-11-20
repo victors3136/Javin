@@ -4,6 +4,8 @@ import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.executionstack.ExecutionStackDeque;
 import interpreter.model.filetable.FileTable;
 import interpreter.model.filetable.FileTableMap;
+import interpreter.model.heapmanager.HeapManager;
+import interpreter.model.heapmanager.HeapManagerTable;
 import interpreter.model.outputlist.OutputList;
 import interpreter.model.outputlist.OutputListArray;
 import interpreter.model.statements.Statement;
@@ -12,30 +14,27 @@ import interpreter.model.symboltable.SymbolTableHashMap;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.values.Value;
 
+import java.util.List;
+import java.util.Map;
+
 public class ProgramStateImplementation implements ProgramState{
 
     private SymbolTable<String,Value> symbolTable;
     private ExecutionStack<Statement> executionStack;
     private OutputList<Value> outputList;
     private FileTable fileTable;
+    private HeapManager heapManager;
     private final Statement originalProgram;
+
 
     public ProgramStateImplementation(Statement originalProgram){
         this.symbolTable = new SymbolTableHashMap<>();
         this.executionStack = new ExecutionStackDeque<>();
         this.outputList = new OutputListArray<>();
         this.fileTable = new FileTableMap();
+        this.heapManager = new HeapManagerTable();
         this.originalProgram = originalProgram;
         executionStack.push(this.originalProgram);
-
-    }
-    public ProgramStateImplementation(SymbolTable<String, Value> symbolTable, ExecutionStack<Statement> executionStack, OutputList<Value> outputList, FileTable fileTable, Statement originalProgram) throws ExpressionException {
-        this.symbolTable = symbolTable;
-        this.executionStack = executionStack;
-        this.outputList = outputList;
-        this.fileTable = fileTable;
-        this.originalProgram = originalProgram.deepCopy();
-        this.executionStack.push(this.originalProgram);
     }
 
     @Override
@@ -75,6 +74,16 @@ public class ProgramStateImplementation implements ProgramState{
     @Override
     public FileTable getFileTable() {
         return fileTable;
+    }
+
+    @Override
+    public void setHeapManager(HeapManager heapManager) {
+        this.heapManager = heapManager;
+    }
+
+    @Override
+    public HeapManager getHeapManager() {
+        return heapManager;
     }
 
     @Override

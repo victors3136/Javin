@@ -8,20 +8,18 @@ import java.util.regex.Pattern;
 
 
 public class TripleStackTokenizer implements Tokenizer {
-    Set<TokenType> tokenTypes;
-
-    private final Map<TokenType, Pattern> precompiledTokenPatterns;
+    static final Set<TokenType> tokenTypes = EnumSet.allOf(TokenType.class);
+    private static final Map<TokenType, Pattern> precompiledTokenPatterns = precompileRegularExps(tokenTypes);
 
     public TripleStackTokenizer() {
-        tokenTypes = EnumSet.allOf(TokenType.class);
-        precompiledTokenPatterns = precompileRegularExps(tokenTypes);
+
     }
 
     public TokenStack tokenize(String source) throws TokenizerException {
         return transformSequenceToPrefix(createTokenSequence(source));
     }
 
-    private Map<TokenType, Pattern> precompileRegularExps(Set<TokenType> tokenTypes) {
+    static private Map<TokenType, Pattern> precompileRegularExps(Set<TokenType> tokenTypes) {
         Map<TokenType, Pattern> map = new HashMap<>();
         for (TokenType token : tokenTypes) {
             map.put(token, Pattern.compile(token.toRegex()));
@@ -30,9 +28,13 @@ public class TripleStackTokenizer implements Tokenizer {
     }
 
     private TokenStack createTokenSequence(String src) throws TokenizerException {
-        TokenStack ts = new TokenStack();
+        TokenStack tokenStack = new TokenStack();
         String source = src.strip();
-        ts.clear();
+        tokenStack.clear();
+        if (src.isEmpty()) {
+            tokenStack.push(new Token(TokenType.EMPTY, source));
+            return tokenStack;
+        }
         while (!source.isEmpty()) {
             boolean match = false;
             for (TokenType tok : tokenTypes) {
@@ -40,11 +42,11 @@ public class TripleStackTokenizer implements Tokenizer {
                 if (result.find()) {
                     match = true;
                     String actualTokenString = result.group().trim();
-                    if (!ts.isEmpty() && ((ts.top().getType() == TokenType.OPEN_PARENTHESIS
-                            && tok == TokenType.CLOSED_PARENTHESIS) || (ts.top().getType() == TokenType.KEYWORD_COMPOUND
-                            && tok == TokenType.KEYWORD_COMPOUND)))
-                        ts.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
-                    ts.push(new Token(tok, actualTokenString));
+                    if (!tokenStack.isEmpty() && ((
+                            tokenStack.top().getType() == TokenType.OPEN_PARENTHESIS && tok == TokenType.CLOSED_PARENTHESIS) ||
+                            (tokenStack.top().getType() == TokenType.KEYWORD_COMPOUND && tok == TokenType.KEYWORD_COMPOUND)))
+                        tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
+                    tokenStack.push(new Token(tok, actualTokenString));
                     source = result.replaceFirst("").strip();
                     break;
                 }
@@ -53,9 +55,9 @@ public class TripleStackTokenizer implements Tokenizer {
                 throw new TokenizerException("Unknown symbol in string : " + source);
             }
         }
-        if (ts.top().getType() == TokenType.KEYWORD_COMPOUND)
-            ts.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
-        return ts;
+        if (tokenStack.top().getType() == TokenType.KEYWORD_COMPOUND)
+            tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
+        return tokenStack;
     }
 
     private TokenStack transformSequenceToPrefix(TokenStack inputStack) throws TokenizerException {

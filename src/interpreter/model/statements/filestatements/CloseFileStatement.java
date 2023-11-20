@@ -22,8 +22,8 @@ public class CloseFileStatement implements Statement {
         return "fclose( "+this.filenameExpression.toString()+" )";
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException {
-        Value value = filenameExpression.evaluate(state.getSymbolTable());
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
+        Value value = filenameExpression.evaluate(state);
         if(!(value instanceof StringValue))
             throw new StatementException("Files are identified by strings -- provided "+value.getType());
         String fileIdentifier = ((StringValue) value).getValue();

@@ -1,6 +1,8 @@
 package interpreter.model.expressions;
 
+import interpreter.model.exceptions.HeapException;
 import interpreter.model.operands.Operand;
+import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.ValueException;
@@ -35,10 +37,10 @@ public class RelationalExpression implements Expression {
 
     @SuppressWarnings({"rawtypes"})
     @Override
-    public Value evaluate(SymbolTable<String, Value> symbolTable) throws ExpressionException, ValueException {
-        Value firstValue = firstExpression.evaluate(symbolTable);
+    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException {
+        Value firstValue = firstExpression.evaluate(state);
         if (firstValue instanceof Comparable cast) {
-            Value secondValue = secondExpression.evaluate(symbolTable);
+            Value secondValue = secondExpression.evaluate(state);
             return switch (operand) {
                 case EQUAL -> cast.equal(secondValue);
                 case NOT_EQUAL -> cast.notEqual(secondValue);

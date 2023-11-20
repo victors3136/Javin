@@ -1,5 +1,6 @@
 package interpreter.model.expressions;
 
+import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.values.Value;
 
@@ -12,7 +13,7 @@ public class ValueExpression implements Expression{
         this.value = value;
     }
     @Override
-    public Value evaluate(SymbolTable<String, Value>  symbolTable) {
+    public Value evaluate(ProgramState state) {
         return value;
     }
 

@@ -19,7 +19,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, TypeException {
+    public ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, TypeException, HeapException {
         ExecutionStack<Statement> executionStack = programState.getExecutionStack();
         if (executionStack.empty()) {
             throw new ControllerException("Empty Stack when trying to take another step inside the program");
@@ -29,7 +29,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public void takeAllSteps() throws SymbolTableException, ControllerException, StatementException, ValueException, ExpressionException, RepositoryException, TypeException {
+    public void takeAllSteps() throws SymbolTableException, ControllerException, StatementException, ValueException, ExpressionException, RepositoryException, TypeException, HeapException {
         ProgramState programState = repository.getCurrentProgram();
 
         System.out.println("Execution starting for current loaded program ...\n" +

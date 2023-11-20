@@ -3,11 +3,13 @@ package interpreter.model.heapmanager;
 import interpreter.model.exceptions.HeapException;
 import interpreter.model.values.Value;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
 public class HeapManagerTable implements HeapManager {
     Map<Integer, Value> storage;
+
     @Override
     public Value get(int index) throws HeapException {
 
@@ -30,4 +32,19 @@ public class HeapManagerTable implements HeapManager {
         storage.put(index, value);
         return index;
     }
+
+    @Override
+    public void update(int address, Value newValue) throws HeapException {
+        if (storage.get(address) == null)
+            throw new HeapException("Segmentation fault. Core dumped");
+        storage.put(address, newValue);
+    }
+
+    @Override
+    public void set(Map<Integer, Value> newHeapState) throws HeapException {
+        if(newHeapState==null)
+            throw new HeapException("Invalid overwrite of heap section");
+        storage = newHeapState;
+    }
+
 }

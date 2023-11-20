@@ -5,11 +5,18 @@ import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Testable;
 
 public class ReferenceValue implements Value, Testable<Value>{
-
-    Type inner;
+    int address;
+    Type locationType;
+    public ReferenceValue(int address, Type referredType){
+        this.address = address;
+        this.locationType = referredType;
+    }
+    public int getAddress(){
+        return address;
+    }
     @Override
     public Type getType() {
-        return this.inner;
+        return locationType;
     }
 
     @Override
