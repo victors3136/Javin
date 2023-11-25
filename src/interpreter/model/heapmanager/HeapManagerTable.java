@@ -3,7 +3,6 @@ package interpreter.model.heapmanager;
 import interpreter.model.exceptions.HeapException;
 import interpreter.model.values.Value;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 

@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class FileTableMap implements FileTable {
-    SortedMap<String, BufferedReader> storage;
+    final SortedMap<String, BufferedReader> storage;
 
     public FileTableMap() {
         super();

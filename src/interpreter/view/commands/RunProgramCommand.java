@@ -19,7 +19,7 @@ public class RunProgramCommand extends Command {
         try {
             controller.takeAllSteps();
         } catch (RepositoryException | SymbolTableException | ControllerException | StatementException |
-                 ValueException | ExpressionException | TypeException | HeapException e) {
+                 ValueException | ExpressionException | TypeException | HeapException | ProgramStateException e) {
             System.err.println(e.getMessage());
         }
     }

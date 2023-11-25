@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.EmptyStackException;
 
 public class TokenStack implements Stack<Token>{
-    ArrayDeque<Token> storage;
+    final ArrayDeque<Token> storage;
     public TokenStack(){
         storage = new ArrayDeque<>();
     }

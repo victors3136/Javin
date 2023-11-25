@@ -8,7 +8,7 @@ import interpreter.repository.Repository;
 import interpreter.repository.RepositoryException;
 
 public class ControllerImplementation implements Controller {
-    Repository repository;
+    final Repository repository;
     public ControllerImplementation(ProgramState programState, Repository repository) {
         this.repository = repository;
         this.repository.add(programState);
@@ -19,7 +19,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, TypeException, HeapException {
+    public ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, TypeException, HeapException, ProgramStateException {
         ExecutionStack<Statement> executionStack = programState.getExecutionStack();
         if (executionStack.empty()) {
             throw new ControllerException("Empty Stack when trying to take another step inside the program");
@@ -29,7 +29,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public void takeAllSteps() throws SymbolTableException, ControllerException, StatementException, ValueException, ExpressionException, RepositoryException, TypeException, HeapException {
+    public void takeAllSteps() throws SymbolTableException, ControllerException, StatementException, ValueException, ExpressionException, RepositoryException, TypeException, HeapException, ProgramStateException {
         ProgramState programState = repository.getCurrentProgram();
 
         System.out.println("Execution starting for current loaded program ...\n" +

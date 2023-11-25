@@ -8,7 +8,7 @@ import interpreter.model.values.operationinterfaces.Testable;
 
 public class BoolValue implements Value, Testable<Value>, Logical {
 
-    boolean value;
+    final boolean value;
 
     public BoolValue() {
         super();

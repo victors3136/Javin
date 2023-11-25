@@ -1,12 +1,11 @@
 package interpreter.model.expressions;
 
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
 
 public class VariableExpression implements Expression{
-    String identifier;
+    final String identifier;
 
     public VariableExpression(String identifier) {
         super();

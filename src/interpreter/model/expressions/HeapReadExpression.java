@@ -8,7 +8,7 @@ import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
 public class HeapReadExpression implements Expression{
-    Expression offsetSpecificationFormula;
+    final Expression offsetSpecificationFormula;
     HeapReadExpression(Expression offsetSpecificationFormula){
         this.offsetSpecificationFormula = offsetSpecificationFormula;
     }

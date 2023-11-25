@@ -1,5 +1,6 @@
 package interpreter.model.programstate;
 
+import interpreter.model.exceptions.ProgramStateException;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.filetable.FileTable;
 import interpreter.model.heapmanager.HeapManager;
@@ -18,9 +19,9 @@ public interface ProgramState {
 
     ExecutionStack<Statement> getExecutionStack();
 
-    void setSymbolTable(SymbolTable<String, Value> symbolTable);
+    void setSymbolTable(SymbolTable<String, Value, Integer> symbolTable);
 
-    SymbolTable<String, Value> getSymbolTable();
+    SymbolTable<String, Value, Integer> getSymbolTable();
 
     void setFileTable(FileTable fileTable);
 
@@ -29,4 +30,10 @@ public interface ProgramState {
     void setHeapManager(HeapManager heapManager);
 
     HeapManager getHeapManager();
+
+    int getCurrentScope();
+
+    void incCurrentScope() throws ProgramStateException;
+
+    void decCurrentScope() throws ProgramStateException;
 }

@@ -1,13 +1,21 @@
+import com.sun.jdi.IntegerType;
 import inputmanager.InputManager;
 import inputmanager.InputMuncher;
 import inputmanager.parser.ParseException;
 import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
 import interpreter.controller.ControllerImplementation;
+import interpreter.model.expressions.ArithmeticExpression;
+import interpreter.model.expressions.RelationalExpression;
+import interpreter.model.expressions.ValueExpression;
+import interpreter.model.expressions.VariableExpression;
+import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.programstate.ProgramStateImplementation;
-import interpreter.model.statements.Statement;
+import interpreter.model.statements.*;
 import interpreter.model.exceptions.ExpressionException;
+import interpreter.model.type.IntType;
+import interpreter.model.values.IntValue;
 import interpreter.repository.Repository;
 import interpreter.repository.RepositoryVector;
 import interpreter.view.TextMenu;
@@ -45,7 +53,8 @@ public class Application {
             System.out.println("1");
             example2 = muncher.eatStringCreateProgram(
                     "str b;" +
-                            "b<-\"b\";" +                            "str bb;" +
+                            "b<-\"b\";" +
+                            "str bb;" +
                             "bb<-b+b;" +
                             "str b3;" +
                             "b3<-bb+b;" +
@@ -62,7 +71,13 @@ public class Application {
                             "fclose(\"in.txt\");" +
                             "fclose(\"in2.txt\")");
             System.out.println("3");
-            example4 = muncher.eatStringCreateProgram(readInput());
+            example4 = muncher.eatStringCreateProgram(
+                    "int a;" +
+                            "a <- 1;" +
+                            "while(a<5)(" +
+                            "int b;" +
+                            "a<-a+1" +
+                            ")");
         } catch (TokenizerException | ParseException | ExpressionException e) {
             System.err.println(e.getMessage());
             System.exit(1);
@@ -86,7 +101,7 @@ public class Application {
         mainMenu.addCommand("1", new RunProgramCommand("1", example1.toString(), controller1));
         mainMenu.addCommand("2", new RunProgramCommand("2", example2.toString(), controller2));
         mainMenu.addCommand("3", new RunProgramCommand("3", example3.toString(), controller3));
-        mainMenu.addCommand("run", new RunProgramCommand("run", example4.toString(), controller4));
+        mainMenu.addCommand("4", new RunProgramCommand("4", example4.toString(), controller4));
         mainMenu.show();
     }
 }

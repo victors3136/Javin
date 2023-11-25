@@ -13,7 +13,6 @@ import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.type.BoolType;
 import interpreter.model.type.IntType;
 import interpreter.model.type.StringType;
-import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
 import interpreter.model.values.StringValue;
@@ -60,6 +59,10 @@ public class RecursiveDescentParser implements Parser {
                 moveToNext();
                 return new PrintStatement(buildExpression());
             }
+            case KEYWORD_WHILE -> {
+                moveToNext();
+                return new WhileStatement(buildExpression(), buildStatement());
+            }
             case EMPTY -> {
                 moveToNext();
                 return new NoOperationStatement();
@@ -78,6 +81,9 @@ public class RecursiveDescentParser implements Parser {
                     default -> null;
                 },
                         getIdentifier());
+            }
+            case TYPE_REF -> {
+                return null; /// TODO
             }
             case KEYWORD_OPEN_FILE -> {
                 moveToNext();

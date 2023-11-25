@@ -1,8 +1,8 @@
 package inputmanager.tokenizer;
 
 public class Token {
-    TokenType type;
-    String sequence;
+    final TokenType type;
+    final String sequence;
     public String getSequence(){ return sequence; }
     public TokenType getType() { return type; }
     @Override

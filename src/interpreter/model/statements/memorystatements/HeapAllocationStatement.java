@@ -8,8 +8,8 @@ import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
 public class HeapAllocationStatement implements Statement {
-    String identifier;
-    Expression expression;
+    final String identifier;
+    final Expression expression;
 
     public HeapAllocationStatement(String identifier, Expression expression) {
         this.identifier = identifier;
@@ -17,7 +17,7 @@ public class HeapAllocationStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, HeapException {
         Value value = state.getSymbolTable().lookup(identifier);
         if(value== null){
             throw new StatementException("Undeclared reference variable -- %s".formatted(identifier));
@@ -28,7 +28,7 @@ public class HeapAllocationStatement implements Statement {
         if(!refVal.getType().equals(expr.getType()))
             throw new StatementException("Mismatched types -- %s, %s".formatted(refVal.getType(), expr.getType()));
         int address = state.getHeapManager().add(expr);
-        state.getSymbolTable().put(identifier, new ReferenceValue(address, value.getType()));
+        state.getSymbolTable().put(identifier, new ReferenceValue(address, value.getType()),state.getCurrentScope());
         return state;
     }
     @Override

@@ -1,7 +1,7 @@
 package interpreter.model.exceptions;
 
 public class ProgramStateException extends Exception {
-    ProgramStateException(String message){
+    public ProgramStateException(String message){
         super(message);
     }
 }

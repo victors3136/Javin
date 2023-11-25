@@ -8,8 +8,8 @@ import interpreter.model.exceptions.TypeException;
 import interpreter.model.values.Value;
 
 public class VariableDeclarationStatement implements Statement {
-    String identifier;
-    Type type;
+    final String identifier;
+    final Type type;
     public VariableDeclarationStatement(String id, Type type ){
         identifier = id;
         this.type = type;
@@ -19,11 +19,11 @@ public class VariableDeclarationStatement implements Statement {
         identifier = id;
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, SymbolTableException, TypeException {
-        SymbolTable<String, Value> st = state.getSymbolTable();
+    public ProgramState execute(ProgramState state) throws StatementException, SymbolTableException {
+        SymbolTable<String, Value, Integer> st = state.getSymbolTable();
         if(st.lookup(identifier) != null)
             throw new StatementException("Redeclaration of a variable");
-        st.put(identifier, type.getDefault());
+        st.put(identifier, type.getDefault(), state.getCurrentScope());
         return state;
     }
 

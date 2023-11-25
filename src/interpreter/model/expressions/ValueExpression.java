@@ -1,11 +1,10 @@
 package interpreter.model.expressions;
 
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.values.Value;
 
 public class ValueExpression implements Expression{
-    Value value;
+    final Value value;
 
 
     public ValueExpression(Value value){

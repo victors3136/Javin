@@ -3,11 +3,9 @@ package interpreter.model.expressions;
 import interpreter.model.exceptions.HeapException;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
-import interpreter.model.values.operationinterfaces.Comparable;
 import interpreter.model.values.operationinterfaces.Logical;
 
 public class LogicExpression implements Expression{

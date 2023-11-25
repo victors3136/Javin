@@ -36,6 +36,7 @@ public enum Operand {
         };
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean logical() {
         return
                 switch (this){
@@ -43,6 +44,7 @@ public enum Operand {
                     default -> false;
                 };
     }
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean arithmetic(){
         return
                 switch(this){
@@ -50,6 +52,7 @@ public enum Operand {
                     default -> false;
                 };
     }
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean relational(){
         return
                 switch(this){

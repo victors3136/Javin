@@ -22,7 +22,7 @@ public class CloseFileStatement implements Statement {
         return "fclose( "+this.filenameExpression.toString()+" )";
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException {
         Value value = filenameExpression.evaluate(state);
         if(!(value instanceof StringValue))
             throw new StatementException("Files are identified by strings -- provided "+value.getType());

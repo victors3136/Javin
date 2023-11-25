@@ -9,7 +9,7 @@ import interpreter.model.values.operationinterfaces.Comparable;
 import java.util.Objects;
 
 public class StringValue implements Value, Additive<Value>, Comparable<Value>, Testable<Value> {
-    String value;
+    final String value;
     public StringValue(String value) {
         if(!value.isEmpty()) {
             StringBuilder buffer = new StringBuilder(value);

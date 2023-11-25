@@ -10,8 +10,8 @@ import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.ExpressionException;
 
 public class InputMuncher implements InputManager {
-    Tokenizer tokenizer;
-    Parser parser;
+    final Tokenizer tokenizer;
+    final Parser parser;
 
     public InputMuncher() {
         tokenizer = new TripleStackTokenizer();

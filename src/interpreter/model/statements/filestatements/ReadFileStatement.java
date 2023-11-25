@@ -14,8 +14,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class ReadFileStatement implements Statement {
-    Expression filenameExpression;
-    String identifier;
+    final Expression filenameExpression;
+    final String identifier;
 
     public ReadFileStatement(Expression filenameExpression, String identifier) {
         this.filenameExpression = filenameExpression;
@@ -23,8 +23,8 @@ public class ReadFileStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
-        SymbolTable<String, Value> symbolTable = state.getSymbolTable();
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, HeapException {
+        SymbolTable<String, Value, Integer> symbolTable = state.getSymbolTable();
         if (symbolTable.lookup(this.identifier) == null) {
             throw new StatementException("Unknown identifier -- " + this.identifier);
         }

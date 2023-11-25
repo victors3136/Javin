@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class TripleStackTokenizer implements Tokenizer {
     static final Set<TokenType> tokenTypes = EnumSet.allOf(TokenType.class);
-    private static final Map<TokenType, Pattern> precompiledTokenPatterns = precompileRegularExps(tokenTypes);
+    private static final Map<TokenType, Pattern> precompiledTokenPatterns = precompileRegularExps();
 
     public TripleStackTokenizer() {
 
@@ -19,9 +19,9 @@ public class TripleStackTokenizer implements Tokenizer {
         return transformSequenceToPrefix(createTokenSequence(source));
     }
 
-    static private Map<TokenType, Pattern> precompileRegularExps(Set<TokenType> tokenTypes) {
+    static private Map<TokenType, Pattern> precompileRegularExps() {
         Map<TokenType, Pattern> map = new HashMap<>();
-        for (TokenType token : tokenTypes) {
+        for (TokenType token : TripleStackTokenizer.tokenTypes) {
             map.put(token, Pattern.compile(token.toRegex()));
         }
         return map;
@@ -73,11 +73,13 @@ public class TripleStackTokenizer implements Tokenizer {
                         TYPE_BOOL,
                         TYPE_INT,
                         TYPE_STR,
+                        TYPE_REF,
                         EMPTY -> resultStack.push(current);
                 case CLOSED_PARENTHESIS,
                         KEYWORD_PRINT,
                         KEYWORD_BRANCH,
                         KEYWORD_IF,
+                        KEYWORD_WHILE,
                         KEYWORD_CLOSE_FILE,
                         KEYWORD_READ_FILE,
                         KEYWORD_OPEN_FILE -> auxStack.push(current);

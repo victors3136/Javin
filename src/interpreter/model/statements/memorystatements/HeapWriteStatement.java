@@ -10,8 +10,8 @@ import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
 public class HeapWriteStatement implements Statement {
-    String identifier;
-    Expression valueExpr;
+    final String identifier;
+    final Expression valueExpr;
     public HeapWriteStatement(String identifier, Expression valueExpr){
         this.identifier = identifier;
         this.valueExpr = valueExpr;

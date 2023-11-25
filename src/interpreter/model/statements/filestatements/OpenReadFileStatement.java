@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class OpenReadFileStatement implements Statement {
-    Expression filenameExpression;
+    final Expression filenameExpression;
     public OpenReadFileStatement(Expression expression){
         this.filenameExpression = expression;
     }
@@ -24,7 +24,7 @@ public class OpenReadFileStatement implements Statement {
         return "fopen( "+this.filenameExpression.toString()+" )";
     }
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, TypeException, HeapException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException {
         FileTable fileTable = state.getFileTable();
         Value value = filenameExpression.evaluate(state);
         if(!(value instanceof StringValue string))

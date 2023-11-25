@@ -10,7 +10,7 @@ import interpreter.model.values.operationinterfaces.Comparable;
 
 public class IntValue implements Value, Numeric<Value>, Additive<Value>, Testable<Value>, Comparable<Value> {
 
-    int value;
+    final int value;
 
     public IntValue() {
         super();

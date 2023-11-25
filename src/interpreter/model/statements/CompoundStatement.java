@@ -4,7 +4,8 @@ import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ExpressionException;
 
 public class CompoundStatement implements Statement {
-    Statement firstStatement, secondStatement;
+    final Statement firstStatement;
+    final Statement secondStatement;
     public CompoundStatement(Statement firstStatement, Statement secondStatement){
         this.firstStatement = firstStatement;
         this.secondStatement = secondStatement;

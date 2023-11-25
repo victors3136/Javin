@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Vector;
 
 public class RepositoryVector implements Repository{
-    List<ProgramState> storage;
+    final List<ProgramState> storage;
     int current;
-    String logFilePath;
+    final String logFilePath;
     public RepositoryVector(String logFilePath){
         storage = new Vector<>();
         current = 0;

@@ -3,14 +3,13 @@ package interpreter.model.statements;
 import interpreter.model.exceptions.*;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 
 public class AssignStatement implements Statement {
 
-    String variableIdentifier;
-    Expression expressionAssignedToVar;
+    final String variableIdentifier;
+    final Expression expressionAssignedToVar;
 
     public AssignStatement(String variableIdentifier, Expression expressionAssignedToVar) {
         this.variableIdentifier = variableIdentifier;

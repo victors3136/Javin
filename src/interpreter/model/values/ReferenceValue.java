@@ -5,8 +5,8 @@ import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Testable;
 
 public class ReferenceValue implements Value, Testable<Value>{
-    int address;
-    Type locationType;
+    final int address;
+    final Type locationType;
     public ReferenceValue(int address, Type referredType){
         this.address = address;
         this.locationType = referredType;
@@ -25,12 +25,12 @@ public class ReferenceValue implements Value, Testable<Value>{
     }
 
     @Override
-    public BoolValue equal(Value other) throws ValueException {
+    public BoolValue equal(Value other) {
         return null;
     }
 
     @Override
-    public BoolValue notEqual(Value other) throws ValueException {
+    public BoolValue notEqual(Value other) {
         return null;
     }
 }

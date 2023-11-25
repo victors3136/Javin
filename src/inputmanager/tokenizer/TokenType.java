@@ -11,6 +11,7 @@ public enum TokenType {
     KEYWORD_IF,
     KEYWORD_BRANCH,
     KEYWORD_PRINT,
+    KEYWORD_WHILE,
     EXP_OP,
     MUL_DIV_OP,
     ADD_SUB_OP,
@@ -39,6 +40,7 @@ public enum TokenType {
             case KEYWORD_IF -> "conditional";
             case KEYWORD_BRANCH -> "clauses";
             case KEYWORD_PRINT -> "print";
+            case KEYWORD_WHILE -> "while";
             case EXP_OP -> "exponential_operand";
             case MUL_DIV_OP -> "star_or_slash";
             case ADD_SUB_OP -> "plus_or_minus";
@@ -68,6 +70,7 @@ public enum TokenType {
             case KEYWORD_IF -> "^if\\b";
             case KEYWORD_BRANCH -> "^else\\b";
             case KEYWORD_PRINT -> "^print\\b";
+            case KEYWORD_WHILE -> "^while\\b";
             case EXP_OP -> "^(\\^)";
             case MUL_DIV_OP -> "^((\\*)|(/))";
             case ADD_SUB_OP -> "^((\\+)|(-))";

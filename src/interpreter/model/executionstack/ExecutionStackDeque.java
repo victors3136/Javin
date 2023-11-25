@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class ExecutionStackDeque<T> implements ExecutionStack<T> {
 
-    Deque<T> storage = new ArrayDeque<>();
+    final Deque<T> storage = new ArrayDeque<>();
 
     public ExecutionStackDeque() {
     }

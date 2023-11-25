@@ -6,7 +6,7 @@ import interpreter.model.values.Value;
 import java.util.Map;
 
 public non-sealed class ReferenceType implements Type{
-    Type inner;
+    final Type inner;
     static Map<Type,ReferenceType> instances;
 
     private ReferenceType(Type t){ inner = t; }

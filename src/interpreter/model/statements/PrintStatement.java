@@ -8,7 +8,7 @@ import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
 
 public class PrintStatement implements Statement {
-    Expression expressionToPrint;
+    final Expression expressionToPrint;
     public PrintStatement(Expression expressionToPrint){
         this.expressionToPrint = expressionToPrint;
     }
