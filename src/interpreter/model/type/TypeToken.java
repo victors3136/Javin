@@ -4,5 +4,5 @@ public enum TypeToken {
     BOOLEAN,
     INTEGER,
     STRING,
-    REFERENCE;
+    REFERENCE
 }

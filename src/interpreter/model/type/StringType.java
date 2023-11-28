@@ -5,7 +5,8 @@ import interpreter.model.values.Value;
 
 public non-sealed class StringType implements Type{
     private static StringType instance = null;
-    private StringType(){};
+    private StringType(){}
+
     public static StringType get(){
         if(instance == null)
             instance = new StringType();

@@ -5,7 +5,7 @@ import interpreter.model.values.Value;
 
 public non-sealed class BoolType implements Type {
     private static BoolType instance = null;
-    private BoolType(){};
+    private BoolType(){}
     public static BoolType get(){
         if (instance == null) {
             instance = new BoolType();
