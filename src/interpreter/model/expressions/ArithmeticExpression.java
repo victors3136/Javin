@@ -1,6 +1,7 @@
 package interpreter.model.expressions;
 
 import interpreter.model.exceptions.HeapException;
+import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ExpressionException;
@@ -11,6 +12,7 @@ import interpreter.model.values.operationinterfaces.Numeric;
 
 import static interpreter.model.operands.Operand.ADD;
 
+@SuppressWarnings("rawtypes")
 public class ArithmeticExpression implements Expression {
     Expression firstExpression, secondExpression;
     Operand operand;
@@ -35,7 +37,8 @@ public class ArithmeticExpression implements Expression {
 
 
     @Override
-    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException {
+    @SuppressWarnings("rawtypes")
+    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException, SymbolTableException {
         Value firstValue = firstExpression.evaluate(state);
 
         if (operand == ADD && firstValue instanceof Additive additiveCast) {

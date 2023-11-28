@@ -3,11 +3,12 @@ package interpreter.model.type;
 import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public non-sealed class ReferenceType implements Type{
     final Type inner;
-    static Map<Type,ReferenceType> instances;
+    final static Map<Type,ReferenceType> instances = new HashMap<>();
 
     private ReferenceType(Type t){ inner = t; }
     static public Type get(Type t){

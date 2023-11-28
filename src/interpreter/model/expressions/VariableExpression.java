@@ -1,5 +1,6 @@
 package interpreter.model.expressions;
 
+import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ValueException;
 import interpreter.model.values.Value;
@@ -13,7 +14,7 @@ public class VariableExpression implements Expression{
     }
 
     @Override
-    public Value evaluate(ProgramState state) throws ValueException {
+    public Value evaluate(ProgramState state) throws ValueException, SymbolTableException {
         Value lookup = state.getSymbolTable().lookup(identifier);
         if(lookup == null)
             throw new ValueException("Unable to evaluate the identifier -- " + identifier );

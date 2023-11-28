@@ -5,9 +5,9 @@ import interpreter.model.programstate.ProgramState;
 
 class ScopeConclusionStatement implements Statement {
     @Override
-    public ProgramState execute(ProgramState state) throws ProgramStateException {
-        state.getSymbolTable().removeOutOfScopeVariables(state.getCurrentScope());
-        state.decCurrentScope();
+    public ProgramState execute(ProgramState state) throws SymbolTableException {
+        state.getSymbolTable().removeOutOfScopeVariables();
+        state.getSymbolTable().decScope();
         return state;
     }
 

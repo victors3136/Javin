@@ -22,7 +22,7 @@ public class TripleStackTokenizer implements Tokenizer {
     static private Map<TokenType, Pattern> precompileRegularExps() {
         Map<TokenType, Pattern> map = new HashMap<>();
         for (TokenType token : TripleStackTokenizer.tokenTypes) {
-            map.put(token, Pattern.compile(token.toRegex()));
+            map.put(token, Pattern.compile(token.regex()));
         }
         return map;
     }
@@ -66,6 +66,13 @@ public class TripleStackTokenizer implements Tokenizer {
         while (!inputStack.isEmpty()) {
             Token current = inputStack.pop();
             switch (current.getType()) {
+                case COMMA -> {
+                    while ((!auxStack.isEmpty())
+                            && (auxStack.top().getType() != TokenType.CLOSED_PARENTHESIS)
+                            && (auxStack.top().getType() != TokenType.KEYWORD_COMPOUND)) {
+                        resultStack.push(auxStack.top());
+                    }
+                }
                 case IDENTIFIER,
                         CONST_BOOLEAN,
                         CONST_INTEGER,
@@ -74,6 +81,7 @@ public class TripleStackTokenizer implements Tokenizer {
                         TYPE_INT,
                         TYPE_STR,
                         TYPE_REF,
+                        KEYWORD_HEAP_READ,
                         EMPTY -> resultStack.push(current);
                 case CLOSED_PARENTHESIS,
                         KEYWORD_PRINT,
@@ -82,7 +90,9 @@ public class TripleStackTokenizer implements Tokenizer {
                         KEYWORD_WHILE,
                         KEYWORD_CLOSE_FILE,
                         KEYWORD_READ_FILE,
-                        KEYWORD_OPEN_FILE -> auxStack.push(current);
+                        KEYWORD_OPEN_FILE,
+                        KEYWORD_HEAP_ALLOC,
+                        KEYWORD_HEAP_WRITE -> auxStack.push(current);
 
                 case KEYWORD_COMPOUND -> {
                     while ((!auxStack.isEmpty())
@@ -107,7 +117,7 @@ public class TripleStackTokenizer implements Tokenizer {
                         ASSIGNMENT_OP,
                         RELATIONAL_OP,
                         LOGICAL_OP -> {
-                    while (!auxStack.isEmpty() && auxStack.top().getType().greaterOrEqualPrecedence(current.getType()))
+                    while (!auxStack.isEmpty() && auxStack.top().getType().compare(current.getType()))
                         resultStack.push(auxStack.pop());
                     auxStack.push(current);
                 }

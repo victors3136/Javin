@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 
 public class ExecutionStackDeque<T> implements ExecutionStack<T> {
 
-    final Deque<T> storage = new ArrayDeque<>();
+    final Deque<T> storage;
 
     public ExecutionStackDeque() {
+        storage = new ArrayDeque<>();
     }
 
     public ExecutionStackDeque(T t) {
+        storage = new ArrayDeque<>();
         this.storage.push(t);
     }
 
@@ -38,7 +40,7 @@ public class ExecutionStackDeque<T> implements ExecutionStack<T> {
     @Override
     public String toString() {
         return storage.stream().
-                map(elem -> elem + "\n┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉\n").
-                collect(Collectors.joining())+"#################\n";
+                map(elem -> elem + " | ").
+                collect(Collectors.joining());
     }
 }

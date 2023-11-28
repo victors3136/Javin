@@ -17,7 +17,7 @@ public class WhileStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, ProgramStateException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
         Value val = condition.evaluate(state);
         if (!(val instanceof BoolValue condVal)) {
             throw new StatementException("Condition of while statement is not evaluable to a boolean");
@@ -27,7 +27,7 @@ public class WhileStatement implements Statement {
             stack.push(this);
             stack.push(new ScopeConclusionStatement());
             stack.push(body);
-            state.incCurrentScope();
+            state.getSymbolTable().incScope();
         }
         return state;
     }
@@ -39,7 +39,7 @@ public class WhileStatement implements Statement {
 
     @Override
     public String toString() {
-        return "while(%s)(\n%s\n)".formatted(condition.toString(), body.toString());
+        return "while( %s )( %s )".formatted(condition.toString(), body.toString());
     }
 
 }

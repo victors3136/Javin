@@ -27,6 +27,6 @@ public class CompoundStatement implements Statement {
 
     @Override
     public String toString(){
-        return firstStatement.toString()+";\n"+ secondStatement.toString();
+        return firstStatement.toString()+" ; "+ secondStatement.toString();
     }
 }

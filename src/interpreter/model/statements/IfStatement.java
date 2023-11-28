@@ -19,7 +19,7 @@ public class IfStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, ProgramStateException {
+    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
         ExecutionStack<Statement> stack = state.getExecutionStack();
         if (stack == null)
             return state;
@@ -31,7 +31,7 @@ public class IfStatement implements Statement {
             stack.push(branchPositive);
         else
             stack.push(branchNegative);
-        state.incCurrentScope();
+        state.getSymbolTable().incScope();
         return state;
     }
 
@@ -42,6 +42,6 @@ public class IfStatement implements Statement {
 
     @Override
     public String toString() {
-        return "if ( " + condition.toString() + " ) (\n" + branchPositive.toString() + "\n) else (\n" + branchNegative.toString() + "\n)";
+        return "if ( " + condition.toString() + " ) ( " + branchPositive.toString() + " ) else ( " + branchNegative.toString() + " )";
     }
 }

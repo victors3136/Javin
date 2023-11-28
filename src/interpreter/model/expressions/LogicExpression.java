@@ -1,6 +1,7 @@
 package interpreter.model.expressions;
 
 import interpreter.model.exceptions.HeapException;
+import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ExpressionException;
@@ -33,7 +34,7 @@ public class LogicExpression implements Expression{
     }
 
     @Override
-    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException {
+    public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException, SymbolTableException {
         Value firstValue = firstExpression.evaluate(state);
         if (firstValue instanceof Logical cast) {
             Value secondValue = secondExpression.evaluate(state);

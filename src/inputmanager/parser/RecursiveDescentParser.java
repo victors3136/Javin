@@ -10,12 +10,13 @@ import interpreter.model.statements.filestatements.CloseFileStatement;
 import interpreter.model.statements.filestatements.OpenReadFileStatement;
 import interpreter.model.statements.filestatements.ReadFileStatement;
 import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.type.BoolType;
-import interpreter.model.type.IntType;
-import interpreter.model.type.StringType;
+import interpreter.model.statements.memorystatements.HeapAllocationStatement;
+import interpreter.model.statements.memorystatements.HeapWriteStatement;
+import interpreter.model.type.*;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
 import interpreter.model.values.StringValue;
+import interpreter.model.values.Value;
 
 import java.util.Objects;
 
@@ -23,157 +24,173 @@ public class RecursiveDescentParser implements Parser {
     TokenStack tokens;
     Token lookahead;
 
-    private void moveToNext() {
+    private void next() {
         if (tokens.isEmpty())
-            lookahead = null;
-        else lookahead = tokens.pop();
+            this.lookahead = null;
+        else this.lookahead = tokens.pop();
     }
 
-    public Statement buildProgram(TokenStack tokens) throws ParseException, ExpressionException {
+    public Statement program(TokenStack tokens) throws ParseException, ExpressionException {
         this.tokens = tokens;
         this.lookahead = this.tokens.pop();
-        return buildStatement();
+        return statement();
     }
 
-    private Statement buildStatement() throws ParseException, ExpressionException {
+    private Statement statement() throws ParseException, ExpressionException {
         if (this.lookahead == null)
             return new NoOperationStatement();
         switch (this.lookahead.getType()) {
             case KEYWORD_COMPOUND -> {
-                moveToNext();
+                next();
                 return new CompoundStatement(
-                        buildStatement(),
-                        buildStatement()
+                        statement(),
+                        statement()
                 );
             }
+            case KEYWORD_HEAP_ALLOC -> {
+                next();
+                return new HeapAllocationStatement(identifier(), expression());
+            }
+            case KEYWORD_HEAP_WRITE -> {
+                next();
+                return new HeapWriteStatement(identifier(), expression());
+            }
             case KEYWORD_IF -> {
-                moveToNext();
-                Expression condition = buildExpression();
+                next();
+                Expression condition = expression();
                 if (this.lookahead.getType() == TokenType.KEYWORD_BRANCH) {
-                    moveToNext();
-                    return new IfStatement(condition, buildStatement(), buildStatement());
-                } else
-                    return new IfStatement(condition, buildStatement(), new NoOperationStatement());
+                    next();
+                    return new IfStatement(condition, statement(), statement());
+                } else {
+                    return new IfStatement(condition, statement(), new NoOperationStatement());
+                }
             }
             case KEYWORD_PRINT -> {
-                moveToNext();
-                return new PrintStatement(buildExpression());
+                next();
+                return new PrintStatement(expression());
             }
             case KEYWORD_WHILE -> {
-                moveToNext();
-                return new WhileStatement(buildExpression(), buildStatement());
+                next();
+                return new WhileStatement(expression(), statement());
             }
             case EMPTY -> {
-                moveToNext();
+                next();
                 return new NoOperationStatement();
             }
             case ASSIGNMENT_OP -> {
-                moveToNext();
-                return new AssignStatement(getIdentifier(), buildExpression());
+                next();
+                return new AssignStatement(identifier(), expression());
             }
-            case TYPE_BOOL, TYPE_INT, TYPE_STR -> {
-                Token previousToken = this.lookahead;
-                moveToNext();
-                return new VariableDeclarationStatement(switch (previousToken.getType()) {
-                    case TYPE_BOOL -> BoolType.get();
-                    case TYPE_INT -> IntType.get();
-                    case TYPE_STR -> StringType.get();
-                    default -> null;
-                },
-                        getIdentifier());
-            }
-            case TYPE_REF -> {
-                return null; /// TODO
+            case TYPE_BOOL, TYPE_INT, TYPE_STR, TYPE_REF -> {
+                return new VariableDeclarationStatement(type(), identifier());
             }
             case KEYWORD_OPEN_FILE -> {
-                moveToNext();
-                return new OpenReadFileStatement(buildExpression());
+                next();
+                return new OpenReadFileStatement(expression());
             }
             case KEYWORD_READ_FILE -> {
-                moveToNext();
-                return new ReadFileStatement(buildExpression(), getIdentifier());
+                next();
+                return new ReadFileStatement(expression(), identifier());
             }
             case KEYWORD_CLOSE_FILE -> {
-                moveToNext();
-                return new CloseFileStatement(buildExpression());
+                next();
+                return new CloseFileStatement(expression());
             }
             default ->
-                    throw new ParseException("Invalid token for Statement -- " + lookahead.getSequence() + " " + lookahead.getType());
+                    throw new ParseException("Invalid token for Statement -- " + this.lookahead.getSequence() + " " + this.lookahead.getType());
         }
     }
 
-    private String getIdentifier() {
+    private String identifier() {
         String id = this.lookahead.getSequence();
-        moveToNext();
+        next();
         return id;
     }
 
-    private Expression buildExpression() throws ParseException, ExpressionException {
+    private Expression expression() throws ParseException, ExpressionException {
         switch (this.lookahead.getType()) {
             case EXP_OP, MUL_DIV_OP, ADD_SUB_OP -> {
-                Token previousToken = this.lookahead;
-                moveToNext();
-                return new ArithmeticExpression(
-                        switch (previousToken.getSequence()) {
-                            case "^" -> Operand.EXP;
-                            case "*" -> Operand.MUL;
-                            case "/" -> Operand.DIV;
-                            case "+" -> Operand.ADD;
-                            case "-" -> Operand.SUB;
-                            default -> throw new ParseException("Invalid operand for arithexp");
-                        },
-                        buildExpression(),
-                        buildExpression()
-                );
+                return new ArithmeticExpression(arithmeticOperand(), expression(), expression());
+            }
+            case KEYWORD_HEAP_READ -> {
+                next();
+                return new HeapReadExpression(expression());
             }
             case LOGICAL_OP -> {
-                Token preiviousToken = this.lookahead;
-                moveToNext();
-                return new LogicExpression(
-                        switch (preiviousToken.getSequence()) {
-                            case "&" -> Operand.AND;
-                            case "|" -> Operand.OR;
-                            default -> throw new ParseException("Invalid operand for logexp");
-                        },
-                        buildExpression(),
-                        buildExpression()
-                );
+                return new LogicExpression(logicalOperand(), expression(), expression());
             }
             case RELATIONAL_OP -> {
-                Token previousToken = this.lookahead;
-                moveToNext();
-                return new RelationalExpression(
-                        switch (previousToken.getSequence()) {
-                            case "==" -> Operand.EQUAL;
-                            case "!=" -> Operand.NOT_EQUAL;
-                            case "<" -> Operand.LOWER;
-                            case ">" -> Operand.GREATER;
-                            case "<=" -> Operand.LOWER_OR_EQUAL;
-                            case ">=" -> Operand.GREATER_OR_EQUAL;
-                            default -> throw new ParseException("Invalid operand for relexp");
-                        },
-                        buildExpression(),
-                        buildExpression()
-                );
+                return new RelationalExpression(relationalOperand(), expression(), expression());
             }
             case CONST_BOOLEAN, CONST_INTEGER, CONST_STRING -> {
-                Token previousToken = this.lookahead;
-                moveToNext();
-                return new ValueExpression(
-                        switch (previousToken.getType()) {
-                            case CONST_BOOLEAN -> new BoolValue(Objects.equals(previousToken.getSequence(), "true"));
-                            case CONST_INTEGER -> new IntValue(Integer.parseInt(previousToken.getSequence()));
-                            case CONST_STRING -> new StringValue(previousToken.getSequence());
-                            default -> throw new ParseException("Invalid constant");
-                        }
-                );
+                return new ValueExpression(value());
             }
             case IDENTIFIER -> {
-                Token previousToken = this.lookahead;
-                moveToNext();
-                return new VariableExpression(previousToken.getSequence());
+                return new VariableExpression(identifier());
             }
-            default -> throw new ParseException("Invalid token for Expression -- " + lookahead.getSequence());
+            default -> throw new ParseException("Invalid token for Expression -- " + this.lookahead.getSequence());
         }
+    }
+
+    private Type type() throws ParseException {
+        Token prev = this.lookahead;
+        next();
+        return switch (prev.getType()) {
+            case TYPE_INT -> IntType.get();
+            case TYPE_BOOL -> BoolType.get();
+            case TYPE_STR -> StringType.get();
+            case TYPE_REF -> ReferenceType.get(type());
+            default -> throw new ParseException("Invalid type -- " + prev.getType() + " " + prev.getSequence());
+        };
+    }
+
+    private Value value() throws ParseException {
+        Token previousToken = this.lookahead;
+        next();
+        return switch (previousToken.getType()) {
+            case CONST_BOOLEAN -> new BoolValue(Objects.equals(previousToken.getSequence(), "true"));
+            case CONST_INTEGER -> new IntValue(Integer.parseInt(previousToken.getSequence()));
+            case CONST_STRING -> new StringValue(previousToken.getSequence());
+            default -> throw new ParseException("Invalid constant");
+        };
+    }
+
+    private Operand relationalOperand() throws ParseException {
+        Token previousToken = this.lookahead;
+        next();
+        return switch (previousToken.getSequence()) {
+            case "==" -> Operand.EQUAL;
+            case "!=" -> Operand.NOT_EQUAL;
+            case "<" -> Operand.LOWER;
+            case ">" -> Operand.GREATER;
+            case "<=" -> Operand.LOWER_OR_EQUAL;
+            case ">=" -> Operand.GREATER_OR_EQUAL;
+            default ->
+                    throw new ParseException("Invalid operand for relexp -- %s".formatted(previousToken.getSequence()));
+        };
+    }
+
+    private Operand arithmeticOperand() throws ParseException {
+        Token previousToken = this.lookahead;
+        next();
+        return switch (previousToken.getSequence()) {
+            case "+" -> Operand.ADD;
+            case "-" -> Operand.SUB;
+            case "*" -> Operand.MUL;
+            case "/" -> Operand.DIV;
+            case "^" -> Operand.EXP;
+            default ->
+                    throw new ParseException("Invalid operand for arithexp -- %s".formatted(previousToken.getSequence()));
+        };
+    }
+
+    private Operand logicalOperand() throws ParseException {
+        Token previousToken = this.lookahead;
+        next();
+        return switch (previousToken.getSequence()) {
+            case "&" -> Operand.AND;
+            case "|" -> Operand.OR;
+            default -> throw new ParseException("Invalid operand for logexp");
+        };
     }
 }

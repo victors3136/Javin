@@ -24,7 +24,7 @@ public class ReadFileStatement implements Statement {
 
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, HeapException {
-        SymbolTable<String, Value, Integer> symbolTable = state.getSymbolTable();
+        SymbolTable<String, Value> symbolTable = state.getSymbolTable();
         if (symbolTable.lookup(this.identifier) == null) {
             throw new StatementException("Unknown identifier -- " + this.identifier);
         }

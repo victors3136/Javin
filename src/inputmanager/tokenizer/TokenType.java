@@ -12,6 +12,9 @@ public enum TokenType {
     KEYWORD_BRANCH,
     KEYWORD_PRINT,
     KEYWORD_WHILE,
+    KEYWORD_HEAP_ALLOC,
+    KEYWORD_HEAP_READ,
+    KEYWORD_HEAP_WRITE,
     EXP_OP,
     MUL_DIV_OP,
     ADD_SUB_OP,
@@ -25,6 +28,7 @@ public enum TokenType {
     KEYWORD_READ_FILE,
     KEYWORD_CLOSE_FILE,
     IDENTIFIER,
+    COMMA,
     EMPTY;
 
     @Override
@@ -41,6 +45,9 @@ public enum TokenType {
             case KEYWORD_BRANCH -> "clauses";
             case KEYWORD_PRINT -> "print";
             case KEYWORD_WHILE -> "while";
+            case KEYWORD_HEAP_ALLOC -> "heap_alloc";
+            case KEYWORD_HEAP_READ -> "heap_read";
+            case KEYWORD_HEAP_WRITE -> "heap_write";
             case EXP_OP -> "exponential_operand";
             case MUL_DIV_OP -> "star_or_slash";
             case ADD_SUB_OP -> "plus_or_minus";
@@ -54,11 +61,12 @@ public enum TokenType {
             case KEYWORD_READ_FILE -> "read_file";
             case KEYWORD_CLOSE_FILE -> "close_file";
             case IDENTIFIER -> "variable_name";
+            case COMMA -> " , ";
             case EMPTY -> "∅";
         };
     }
 
-    public String toRegex() {
+    public String regex() {
         return switch (this) {
             case TYPE_BOOL -> "^bool\\b";
             case TYPE_INT -> "^int\\b";
@@ -71,6 +79,9 @@ public enum TokenType {
             case KEYWORD_BRANCH -> "^else\\b";
             case KEYWORD_PRINT -> "^print\\b";
             case KEYWORD_WHILE -> "^while\\b";
+            case KEYWORD_HEAP_ALLOC -> "^heap_alloc\\b";
+            case KEYWORD_HEAP_READ -> "^heap_read\\b";
+            case KEYWORD_HEAP_WRITE -> "^heap_write\\b";
             case EXP_OP -> "^(\\^)";
             case MUL_DIV_OP -> "^((\\*)|(/))";
             case ADD_SUB_OP -> "^((\\+)|(-))";
@@ -84,10 +95,11 @@ public enum TokenType {
             case KEYWORD_READ_FILE -> "^fread\\b";
             case KEYWORD_CLOSE_FILE -> "^fclose\\b";
             case IDENTIFIER -> "^[a-zA-Z_][a-zA-Z_0-9]*";
+            case COMMA -> "^,";
             case EMPTY -> "^$";
         };
     }
-    private int getPrecedence(){
+    private int precedence(){
         return switch (this){
             case EXP_OP -> 5;
             case MUL_DIV_OP -> 4;
@@ -99,7 +111,7 @@ public enum TokenType {
         };
     }
 
-    public boolean greaterOrEqualPrecedence(TokenType type) {
-        return this.getPrecedence() >= type.getPrecedence();
+    public boolean compare(TokenType type) {
+        return this.precedence() >= type.precedence();
     }
 }

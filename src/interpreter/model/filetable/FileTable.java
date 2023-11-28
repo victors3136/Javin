@@ -10,4 +10,6 @@ public interface FileTable {
     BufferedReader lookup(String value);
 
     void remove(String fileIdentifier);
+
+    void cleanup();
 }

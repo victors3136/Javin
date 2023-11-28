@@ -1,6 +1,6 @@
 package interpreter.model.values;
 
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.type.ReferenceType;
 import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Testable;
 
@@ -16,7 +16,7 @@ public class ReferenceValue implements Value, Testable<Value>{
     }
     @Override
     public Type getType() {
-        return locationType;
+        return ReferenceType.get(locationType);
     }
 
     @Override
@@ -32,5 +32,10 @@ public class ReferenceValue implements Value, Testable<Value>{
     @Override
     public BoolValue notEqual(Value other) {
         return null;
+    }
+
+    @Override
+    public String toString(){
+        return "(%s @ %d)".formatted(locationType, address);
     }
 }
