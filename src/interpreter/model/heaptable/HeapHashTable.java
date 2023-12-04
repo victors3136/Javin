@@ -24,6 +24,7 @@ public class HeapHashTable implements HeapTable {
 
     @Override
     public Value get(int index) throws HeapException {
+        System.out.println("******---"+index);
         Value value = storage.get(index);
         if (value == null) {
             throw new HeapException("Segmentation fault. Core dumped");

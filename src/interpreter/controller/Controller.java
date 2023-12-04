@@ -5,10 +5,12 @@ import interpreter.model.exceptions.*;
 import interpreter.repository.Repository;
 import interpreter.repository.RepositoryException;
 
-public interface Controller {
-    void setCurrentProgramInRepo(int index) throws RepositoryException;
-    ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, HeapException;
-    void takeAllSteps() throws SymbolTableException, ControllerException, StatementException, ValueException, ExpressionException, RepositoryException, HeapException;
-    Repository getRepository();
+import java.util.List;
 
+public interface Controller {
+//    void setCurrentProgramInRepo(int index) throws RepositoryException;
+//    ProgramState takeOneStep(ProgramState programState) throws ControllerException, SymbolTableException, StatementException, ValueException, ExpressionException, HeapException;
+    void takeAllSteps() throws RepositoryException;
+    Repository getRepository();
+    List<ProgramState> removeCompletedPrograms(List<ProgramState> input);
 }

@@ -6,10 +6,12 @@ import java.util.Map;
 
 import java.util.stream.Collectors;
 
+import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.utils.DeepCopiable;
 
-public class SymbolTableHashMap<Identifier, Value> implements SymbolTable<Identifier, Value> {
-    private static class MyPair<T1, T2> {
+public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implements SymbolTable<Identifier, Value>{
+    private static class MyPair<T1 extends DeepCopiable, T2> implements DeepCopiable {
         private final T1 first;
         private final T2 second;
 
@@ -30,15 +32,24 @@ public class SymbolTableHashMap<Identifier, Value> implements SymbolTable<Identi
         public String toString() {
             return "(%s , %s)".formatted(first.toString(), second.toString());
         }
+
+        @Override
+        public MyPair<T1, T2> deepCopy() throws ExpressionException {
+            return new MyPair<>((T1) first.deepCopy(), second);
+        }
     }
 
     static final int MAX_SCOPE = 512, MIN_SCOPE = 0;
-    final Map<Identifier, MyPair<Value, Integer>> storage;
+    Map<Identifier, MyPair<Value, Integer>> storage;
     int currentScope;
 
-    public SymbolTableHashMap() {
+    public SymbolTableHashMap(){
         this.storage = new HashMap<>();
-        currentScope = 0;
+        this.currentScope = 0;
+    }
+    private SymbolTableHashMap(Map<Identifier, MyPair<Value, Integer>> copiedStorage, int currentScope) {
+        this.storage = new HashMap<>();
+        this.currentScope = 0;
     }
 
     @Override
@@ -93,10 +104,28 @@ public class SymbolTableHashMap<Identifier, Value> implements SymbolTable<Identi
                 .collect(Collectors.toList());
     }
 
+    public SymbolTable<Identifier, Value> deepCopy() {
+        Map<Identifier, MyPair<Value, Integer>> copiedStorage = storage.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> {
+                    try {
+                        return entry.getValue().deepCopy();
+                    } catch (ExpressionException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        ));
+
+        return new SymbolTableHashMap<>(copiedStorage, currentScope);
+    }
+
+
     @Override
     public String toString() {
         return storage.keySet().stream().
                 map(key -> key.toString() + " == " + storage.get(key).first() + " ; ").
                 collect(Collectors.joining());
     }
+
+
 }

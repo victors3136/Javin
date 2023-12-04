@@ -1,5 +1,6 @@
 package interpreter.model.programstate;
 
+import interpreter.model.exceptions.*;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.filetable.FileTable;
 import interpreter.model.heaptable.HeapTable;
@@ -30,6 +31,9 @@ public interface ProgramState {
 
     HeapTable getHeapTable();
 
+    boolean isNotCompleted();
+
+    ProgramState takeOneStep() throws ProgramStateException, SymbolTableException, StatementException, ValueException, ExpressionException, HeapException;
 
 
 }

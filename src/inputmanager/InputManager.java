@@ -10,17 +10,15 @@ import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.ExpressionException;
 
 public class InputManager implements StringToStatementConverter {
-    final Tokenizer tokenizer;
-    final Parser parser;
+    static final Tokenizer tokenizer = new TripleStackTokenizer();
+    static final Parser parser = new RecursiveDescentParser();
 
     public InputManager() {
-        this.tokenizer = new TripleStackTokenizer();
-        this.parser = new RecursiveDescentParser();
     }
 
     @Override
     public Statement program(String source) throws TokenizerException, ParseException, ExpressionException {
-        return this.parser.program(this.tokenizer.tokenize(source));
+        return parser.program(tokenizer.tokenize(source));
     }
 
 }

@@ -129,7 +129,13 @@ public class Application {
                     ));
                     print(a);
                     print(b);
-                    fclose(b)
+                    fclose(b);
+                    ref int v;
+                    heap_alloc(v,20);
+                    ref ref int AA;
+                    heap_alloc(AA,v);
+                    heap_alloc(v,30);
+                    print(heap_read(heap_read(AA)))
                     """;
         Statement arithmeticAndConditionalTest = null;
         Statement stringConcatTest = null;

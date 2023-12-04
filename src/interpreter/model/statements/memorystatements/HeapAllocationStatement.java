@@ -37,7 +37,7 @@ public class HeapAllocationStatement implements Statement {
 
     @Override
     public String toString() {
-        return "new ( %s , %s ) ".formatted(identifier, expression.toString());
+        return "heap_alloc ( %s , %s ) ".formatted(identifier, expression.toString());
     }
 
     @Override

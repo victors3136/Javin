@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 public class RepositoryVector implements Repository{
-    final List<ProgramState> storage;
+    List<ProgramState> storage;
     int current;
     final String logFilePath;
     public RepositoryVector(String logFilePath){
@@ -25,14 +25,14 @@ public class RepositoryVector implements Repository{
         this.storage.add(ps);
     }
 
-    @Override
+//    @Override
     public void setCurrentProgram(int position) throws RepositoryException {
         if(position >= storage.size())
             throw new RepositoryException("Position does not represent a valid index within the interpreter.repository");
         this.current = position;
     }
 
-    @Override
+//    @Override
     public ProgramState getCurrentProgram() {
         return this.storage.get(this.current);
     }
@@ -48,11 +48,21 @@ public class RepositoryVector implements Repository{
     }
 
     @Override
-    public void logProgramStateExecution() throws RepositoryException {
+    public void logProgramStateExecution(ProgramState toLog) throws RepositoryException {
         try(PrintWriter logger = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)))){
-            logger.println(getCurrentProgram());
+            logger.println(toLog);
         } catch (IOException e) {
             throw new RepositoryException(e.getMessage());
         }
+    }
+
+    @Override
+    public List<ProgramState> getProgramList() {
+        return storage;
+    }
+
+    @Override
+    public void setProgramList(List<ProgramState> input) {
+            storage = input;
     }
 }

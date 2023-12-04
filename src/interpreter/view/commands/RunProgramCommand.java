@@ -1,8 +1,6 @@
 package interpreter.view.commands;
 
 import interpreter.controller.Controller;
-import interpreter.controller.ControllerException;
-import interpreter.model.exceptions.*;
 import interpreter.repository.RepositoryException;
 import interpreter.view.Command;
 
@@ -18,9 +16,8 @@ public class RunProgramCommand extends Command {
     public void execute() {
         try {
             controller.takeAllSteps();
-        } catch (RepositoryException | SymbolTableException | ControllerException | StatementException |
-                 ValueException | ExpressionException | HeapException e) {
-            System.err.println(e.getMessage());
+        } catch (RepositoryException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
