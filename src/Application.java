@@ -54,13 +54,13 @@ public class Application {
         String fileOperationSource =
                 """
                         fopen("in.txt");
-                        \t  fopen("in2.txt");
-                        \t  \t  int a;
-                        \t  \t  fread("in.txt", a);
-                        \t  \t  \t  print(a);
-                        \t  \t  \t  fread("in2.txt", a);
-                        \t  \t  \t  \t  print(a);
-                        \t  fclose("in2.txt");
+                        fopen("in2.txt");
+                        int a;
+                        fread("in.txt", a);
+                        print(a);
+                        fread("in2.txt", a);
+                        print(a);
+                        fclose("in2.txt");
                         fclose("in.txt")
                         """;
         String repetitiveInstructionSource =
@@ -115,8 +115,6 @@ public class Application {
                     ref int c;
                     heap_alloc(c, 10);
                     heap_write(c, 100);
-                    ref ref int d;
-                    heap_alloc(d, c);
                     b <- "in4.txt";
                     fopen( b );
                     fread( b, a );
@@ -132,10 +130,9 @@ public class Application {
                     fclose(b);
                     ref int v;
                     heap_alloc(v,20);
-                    ref ref int AA;
-                    heap_alloc(AA,v);
+                    ref ref int alpha;
                     heap_alloc(v,30);
-                    print(heap_read(heap_read(AA)))
+                    print(heap_read(heap_read(alpha)))
                     """;
         Statement arithmeticAndConditionalTest = null;
         Statement stringConcatTest = null;
