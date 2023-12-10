@@ -11,13 +11,10 @@ public class OutputListArray<T> implements OutputList<T> {
         this.storage = new ArrayList<>();
     }
 
-    public OutputListArray(ArrayList<T> outputList) {
-        this.storage = outputList;
-    }
-
     @Override
     public void append(T t) {
         storage.add(t);
+        System.out.println(t);
     }
 
     @Override

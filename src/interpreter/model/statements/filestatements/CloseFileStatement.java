@@ -34,7 +34,7 @@ public class CloseFileStatement implements Statement {
             throw new StatementException(e.getMessage()+" -- "+fileIdentifier);
         }
         fileTable.remove(fileIdentifier);
-        return state;
+        return null;
     }
 
     @Override

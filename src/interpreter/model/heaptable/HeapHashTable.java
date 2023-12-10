@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class HeapHashTable implements HeapTable {
     private static final int HEAP_SIZE = 1024;
-    private Map<Integer, Value> storage;
+    private final Map<Integer, Value> storage;
 
     public HeapHashTable() {
         storage = new HashMap<>();
@@ -24,7 +24,6 @@ public class HeapHashTable implements HeapTable {
 
     @Override
     public Value get(int index) throws HeapException {
-        System.out.println("******---"+index);
         Value value = storage.get(index);
         if (value == null) {
             throw new HeapException("Segmentation fault. Core dumped");
@@ -34,11 +33,11 @@ public class HeapHashTable implements HeapTable {
 
     @Override
     public int add(Value value) throws HeapException {
-        int index = IntStream.
-                iterate(1, i -> i < HEAP_SIZE, i -> i + 1).
-                filter(i -> storage.get(i) == null).
-                findFirst().
-                orElse(0);
+        int index = IntStream
+                .iterate(1, i -> i < HEAP_SIZE, i -> i + 1)
+                .filter(i -> storage.get(i) == null)
+                .findFirst()
+                .orElse(0);
         if (index == 0)
             throw new HeapException("Heap overflow");
         storage.put(index, value);
@@ -53,22 +52,9 @@ public class HeapHashTable implements HeapTable {
     }
 
     @Override
-    public void set(Map<Integer, Value> newHeapState) throws HeapException {
-        if (newHeapState == null)
-            throw new HeapException("Invalid overwrite of heap section");
-        storage = newHeapState;
-    }
-
-    @Override
     public Stream<AbstractMap.Entry<Integer, Value>> entriesStream() {
         return storage.entrySet().stream();
     }
-
-    @Override
-    public void cleanup() {
-        storage.clear();
-    }
-
 
     @Override
     public String toString() {

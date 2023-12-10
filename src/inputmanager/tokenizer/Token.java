@@ -1,24 +1,17 @@
 package inputmanager.tokenizer;
 
-public class Token {
-    final TokenType type;
-    final String sequence;
-    public String getSequence(){ return sequence; }
-    public TokenType getType() { return type; }
+public record Token(TokenType type, String sequence) {
     @Override
-    public String toString(){
-        return getType()+" "+getSequence();
+    public String toString() {
+        return type() + " " + sequence();
     }
-    public Token (TokenType type, String sequence){
+
+    public Token(TokenType type, String sequence) {
         this.type = type;
-        if(type != TokenType.TYPE_STR) {
+        if (type != TokenType.TYPE_STR) {
             this.sequence = sequence;
             return;
         }
         this.sequence = sequence.replaceAll("^\"|\"$", "");
-    }
-    public Token(Token t) {
-        this.type = t.type;
-        this.sequence = t.sequence;
     }
 }

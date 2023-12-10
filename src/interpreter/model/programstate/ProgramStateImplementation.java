@@ -15,49 +15,44 @@ import interpreter.model.symboltable.SymbolTableHashMap;
 import interpreter.model.values.Value;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class ProgramStateImplementation implements ProgramState {
-    private static Integer id = 0;
-    //    private int id;
-//    private static Integer COUNTER = 0;
+    private final int id;
+    private static Integer ID_GENERATOR = 0;
+    private static final Object LOCK = new Object();
     private SymbolTable<String, Value> symbolTable;
     private ExecutionStack<Statement> executionStack;
     private OutputList<Value> outputList;
     private FileTable fileTable;
     private HeapTable heapTable;
-    //private final Statement originalProgram;
-
 
     public ProgramStateImplementation(Statement originalProgram) {
-        id = nextID();
-//        synchronized (COUNTER){
-//            id = COUNTER ++;
-//        }
+        synchronized(LOCK){
+            this.id = ID_GENERATOR++;
+        }
         this.symbolTable = new SymbolTableHashMap<>();
         this.executionStack = new ExecutionStackDeque<>();
         this.outputList = new OutputListArray<>();
         this.fileTable = new FileTableMap();
         this.heapTable = new HeapHashTable();
-        //this.originalProgram = originalProgram;
         executionStack.push(originalProgram);
     }
 
     private ProgramStateImplementation(Statement target, SymbolTable<String, Value> symbolTable, HeapTable heapTable, FileTable fileTable, OutputList<Value> outputList) {
-        id = nextID();
+        synchronized(LOCK){
+            this.id = ID_GENERATOR++;
+        }
         this.symbolTable = symbolTable.deepCopy();
         this.heapTable = heapTable;
         this.fileTable = fileTable;
         this.outputList = outputList;
+        this.executionStack = new ExecutionStackDeque<>();
+        this.executionStack.push(target);
     }
-    public static ProgramState forkProgram(Statement target, ProgramState parentProgram){
+
+    public static ProgramState forkProgram(Statement target, ProgramState parentProgram) {
         return new ProgramStateImplementation(target, parentProgram.getSymbolTable(), parentProgram.getHeapTable(), parentProgram.getFileTable(), parentProgram.getOutputList());
-    }
-    private synchronized Integer nextID() {
-        return id++;
     }
 
     @Override
@@ -112,7 +107,7 @@ public class ProgramStateImplementation implements ProgramState {
 
     @Override
     public boolean isNotCompleted() {
-        return executionStack.empty();
+        return !executionStack.empty();
     }
 
     @Override
@@ -144,7 +139,7 @@ public class ProgramStateImplementation implements ProgramState {
                 outputList.toString());
     }
 
-    private synchronized Integer getID() {
+    private Integer getID() {
         return id;
     }
 }

@@ -11,5 +11,4 @@ public interface FileTable {
 
     void remove(String fileIdentifier);
 
-    void cleanup();
 }

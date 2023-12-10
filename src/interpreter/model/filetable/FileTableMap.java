@@ -3,7 +3,6 @@ package interpreter.model.filetable;
 import interpreter.model.values.StringValue;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -38,13 +37,4 @@ public class FileTableMap implements FileTable {
         storage.remove(fileIdentifier);
     }
 
-    @Override
-    public void cleanup() {
-        for (BufferedReader file : storage.values()) {
-            try {
-                file.close();
-            } catch (IOException ignored) {
-            }
-        }
-    }
 }

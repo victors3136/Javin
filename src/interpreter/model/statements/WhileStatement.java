@@ -29,7 +29,7 @@ public class WhileStatement implements Statement {
             stack.push(body);
             state.getSymbolTable().incScope();
         }
-        return state;
+        return null;
     }
 
     @Override

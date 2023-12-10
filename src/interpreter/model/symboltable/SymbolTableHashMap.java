@@ -10,7 +10,7 @@ import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.utils.DeepCopiable;
 
-public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implements SymbolTable<Identifier, Value>{
+public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implements SymbolTable<Identifier, Value> {
     private static class MyPair<T1 extends DeepCopiable, T2> implements DeepCopiable {
         private final T1 first;
         private final T2 second;
@@ -40,16 +40,17 @@ public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implemen
     }
 
     static final int MAX_SCOPE = 512, MIN_SCOPE = 0;
-    Map<Identifier, MyPair<Value, Integer>> storage;
+    final Map<Identifier, MyPair<Value, Integer>> storage;
     int currentScope;
 
-    public SymbolTableHashMap(){
+    public SymbolTableHashMap() {
         this.storage = new HashMap<>();
         this.currentScope = 0;
     }
+
     private SymbolTableHashMap(Map<Identifier, MyPair<Value, Integer>> copiedStorage, int currentScope) {
-        this.storage = new HashMap<>();
-        this.currentScope = 0;
+        this.storage = copiedStorage;
+        this.currentScope = currentScope;
     }
 
     @Override
@@ -105,17 +106,14 @@ public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implemen
     }
 
     public SymbolTable<Identifier, Value> deepCopy() {
-        Map<Identifier, MyPair<Value, Integer>> copiedStorage = storage.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> {
-                    try {
-                        return entry.getValue().deepCopy();
-                    } catch (ExpressionException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        ));
-
+        Map<Identifier, MyPair<Value, Integer>> copiedStorage = storage
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> this.storage.get(entry.getKey())
+                        )
+                );
         return new SymbolTableHashMap<>(copiedStorage, currentScope);
     }
 

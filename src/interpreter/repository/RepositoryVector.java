@@ -11,32 +11,11 @@ import java.util.Vector;
 
 public class RepositoryVector implements Repository{
     List<ProgramState> storage;
-    int current;
     final String logFilePath;
     public RepositoryVector(String logFilePath){
         storage = new Vector<>();
-        current = 0;
         this.logFilePath = logFilePath;
     }
-    public RepositoryVector(ProgramState ps, String logFilePath) {
-        storage = new Vector<>();
-        current = 0;
-        this.logFilePath = logFilePath;
-        this.storage.add(ps);
-    }
-
-//    @Override
-    public void setCurrentProgram(int position) throws RepositoryException {
-        if(position >= storage.size())
-            throw new RepositoryException("Position does not represent a valid index within the interpreter.repository");
-        this.current = position;
-    }
-
-//    @Override
-    public ProgramState getCurrentProgram() {
-        return this.storage.get(this.current);
-    }
-
     @Override
     public void add(ProgramState programState) {
         storage.add(programState);
@@ -50,7 +29,7 @@ public class RepositoryVector implements Repository{
     @Override
     public void logProgramStateExecution(ProgramState toLog) throws RepositoryException {
         try(PrintWriter logger = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)))){
-            logger.println(toLog);
+            logger.println(toLog.toString());
         } catch (IOException e) {
             throw new RepositoryException(e.getMessage());
         }

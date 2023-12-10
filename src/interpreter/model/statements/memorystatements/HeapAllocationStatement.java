@@ -32,7 +32,7 @@ public class HeapAllocationStatement implements Statement {
             throw new StatementException("Mismatched types -- %s, %s".formatted(refVal.getType(), ReferenceType.get(expr.getType())));
         int address = state.getHeapTable().add(expr);
         state.getSymbolTable().update(identifier, new ReferenceValue(address, expr.getType()));
-        return state;
+        return null;
     }
 
     @Override

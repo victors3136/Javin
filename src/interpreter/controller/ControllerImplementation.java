@@ -1,92 +1,126 @@
 package interpreter.controller;
 
-import interpreter.model.exceptions.*;
-import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.heaptable.HeapHashTable;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.statements.Statement;
 import interpreter.model.values.ReferenceValue;
-import interpreter.model.values.Value;
 import interpreter.repository.Repository;
 import interpreter.repository.RepositoryException;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ControllerImplementation implements Controller {
     private final Repository repository;
-    private final String input;
     private ExecutorService executor;
 
-    public ControllerImplementation(String input, ProgramState programState, Repository repository) {
-        this.input = input;
+    public ControllerImplementation(ProgramState programState, Repository repository) {
         this.repository = repository;
         this.repository.add(programState);
     }
 
-
-    @Override
-    public void takeAllSteps() throws RepositoryException {
-        ProgramState programState = repository.getProgramList().get(0);
-        System.out.println("Execution starting for current loaded program ...\n");
-        System.out.println(input);
-        repository.logProgramStateExecution(programState);
-        try {
-            while (!programState.getExecutionStack().empty()) {
-                programState.takeOneStep();
-                collectGarbage();
-                repository.logProgramStateExecution(programState);
+    private void takeOneStepForAll(List<ProgramState> inputList) {
+        inputList.forEach(program -> {
+            try {
+                repository.logProgramStateExecution(program);
+            } catch (RepositoryException e) {
+                System.err.println(e.getMessage());
             }
-        } catch (SymbolTableException | StatementException | ValueException | ExpressionException |
-                 RepositoryException | HeapException | ProgramStateException e) {
-            System.out.println(e.getMessage());
+        });
+        List<Callable<ProgramState>> callList = inputList
+                                                    .stream()
+                                                    .map(program -> (Callable<ProgramState>) (program::takeOneStep))
+                                                    .toList();
+        List<ProgramState> newList;
+        try {
+            newList = executor
+                    .invokeAll(callList)
+                    .stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        } catch (ExecutionException | InterruptedException err) {
+                            System.err.println(err.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+        } catch (InterruptedException err) {
+            System.err.println(err.getMessage());
+            return;
         }
-        System.out.println("Final Program Output: \n");
-        System.out.println(programState.getOutputList().toString());
-        programState.getFileTable().cleanup();
-        programState.getHeapTable().cleanup();
-        repository.logProgramStateExecution(programState);
+        inputList.addAll(newList);
+        inputList.forEach(program -> {
+            try {
+                repository.logProgramStateExecution(program);
+            } catch (RepositoryException e) {
+                System.err.println(e.getMessage());
+            }
+        });
+        repository.setProgramList(inputList);
     }
 
     @Override
-    public Repository getRepository() {
-        return repository;
+    public void takeAllSteps() {
+        executor = Executors.newFixedThreadPool(2);
+        List<ProgramState> programs = removeCompletedPrograms(repository.getProgramList());
+        while (!programs.isEmpty()) {
+            collectGarbage();
+            takeOneStepForAll(programs);
+            programs = removeCompletedPrograms(programs);
+        }
+        executor.shutdownNow();
+        repository.setProgramList(programs);
     }
 
     @Override
     public List<ProgramState> removeCompletedPrograms(List<ProgramState> input) {
-        return input.stream().filter(ProgramState::isNotCompleted).collect(Collectors.toList());
+        return input
+                .stream()
+                .filter(ProgramState::isNotCompleted)
+                .collect(Collectors.toList());
     }
 
-    private Set<Integer> getReachableAddresses(int id) {
+    private Set<Integer> getReachableAddresses() {
         return Stream.concat(
                 /// Reachable addresses from Symbol table
-                repository.getProgramList().get(id).getSymbolTable()
-                        .getValues()
-                        .stream()
-                        .filter(x -> x instanceof ReferenceValue)
+                repository.getProgramList().stream()
+                        .flatMap(program -> program.getSymbolTable().getValues().stream())
+                        .filter(value -> value instanceof ReferenceValue)
                         .map(x -> ((ReferenceValue) x).getAddress())
                 ,
                 /// Reachable addresses from within the heap
-                repository.getProgramList().get(id).getHeapTable()
-                        .entriesStream()
-                        .filter(x -> x.getValue() instanceof ReferenceValue)
-                        .map(Map.Entry::getValue)
-                        .map(x -> ((ReferenceValue) x).getAddress())
+                repository.getProgramList()
+                        .stream()
+                        .flatMap(program -> program.getHeapTable().entriesStream())
+                        .collect(Collectors.toSet())
+                        .stream()
+                        .filter(mapEntry -> mapEntry.getValue() instanceof ReferenceValue)
+                        .map(x -> ((ReferenceValue) x.getValue()).getAddress())
         ).collect(Collectors.toSet());
     }
 
     private void collectGarbage() {
-        HashMap<Integer, Value> newHeap = repository.getProgramList().get(0).getHeapTable()
-                .entriesStream()
-                .filter(x -> getReachableAddresses(0).contains(x.getKey()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (value, repeatValue) -> value,
-                        HashMap::new));
-        repository.getProgramList().get(0).setHeapTable(new HeapHashTable(newHeap));
+        Set<Integer> addresses = this.getReachableAddresses();
+        HeapHashTable newHeap = new HeapHashTable(repository
+                .getProgramList()
+                .stream()
+                .flatMap(program -> program.getHeapTable()
+                        .entriesStream()
+                        .filter(entry -> addresses.contains(entry.getKey())))
+                .collect(Collectors
+                        .toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (value, repeatValue) -> value,
+                                HashMap::new
+                        )
+                ));
+        repository.getProgramList().forEach(program -> program.setHeapTable(newHeap));
     }
 }

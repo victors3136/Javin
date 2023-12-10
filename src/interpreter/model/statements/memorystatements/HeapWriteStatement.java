@@ -31,7 +31,7 @@ public class HeapWriteStatement implements Statement {
             throw new ExpressionException("Mismatched types -- %s, %s".formatted(ref.getType(), expr.getType()));
         }
         state.getHeapTable().update(ref.getAddress(), expr);
-        return state;
+        return null;
     }
 
     @Override

@@ -12,11 +12,6 @@ public class ExecutionStackDeque<T> implements ExecutionStack<T> {
         storage = new ArrayDeque<>();
     }
 
-    public ExecutionStackDeque(T t) {
-        storage = new ArrayDeque<>();
-        this.storage.push(t);
-    }
-
     @Override
     public void push(T t) {
         storage.push(t);
@@ -25,11 +20,6 @@ public class ExecutionStackDeque<T> implements ExecutionStack<T> {
     @Override
     public T pop() {
         return storage.pop();
-    }
-
-    @Override
-    public T top() {
-        return storage.peek();
     }
 
     @Override

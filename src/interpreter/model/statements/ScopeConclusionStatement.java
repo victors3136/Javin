@@ -8,7 +8,7 @@ class ScopeConclusionStatement implements Statement {
     public ProgramState execute(ProgramState state) throws SymbolTableException {
         state.getSymbolTable().removeOutOfScopeVariables();
         state.getSymbolTable().decScope();
-        return state;
+        return null;
     }
 
     @Override

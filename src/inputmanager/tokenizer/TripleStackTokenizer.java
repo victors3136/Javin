@@ -43,8 +43,8 @@ public class TripleStackTokenizer implements Tokenizer {
                     match = true;
                     String actualTokenString = result.group().trim();
                     if (!tokenStack.isEmpty() && ((
-                            tokenStack.top().getType() == TokenType.OPEN_PARENTHESIS && tok == TokenType.CLOSED_PARENTHESIS) ||
-                            (tokenStack.top().getType() == TokenType.KEYWORD_COMPOUND && tok == TokenType.KEYWORD_COMPOUND)))
+                            tokenStack.top().type() == TokenType.OPEN_PARENTHESIS && tok == TokenType.CLOSED_PARENTHESIS) ||
+                            (tokenStack.top().type() == TokenType.KEYWORD_COMPOUND && tok == TokenType.KEYWORD_COMPOUND)))
                         tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
                     tokenStack.push(new Token(tok, actualTokenString));
                     source = result.replaceFirst("").strip();
@@ -55,7 +55,7 @@ public class TripleStackTokenizer implements Tokenizer {
                 throw new TokenizerException("Unknown symbol in string : " + source);
             }
         }
-        if (tokenStack.top().getType() == TokenType.KEYWORD_COMPOUND)
+        if (tokenStack.top().type() == TokenType.KEYWORD_COMPOUND)
             tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
         return tokenStack;
     }
@@ -65,12 +65,12 @@ public class TripleStackTokenizer implements Tokenizer {
         TokenStack resultStack = new TokenStack();
         while (!inputStack.isEmpty()) {
             Token current = inputStack.pop();
-            switch (current.getType()) {
+            switch (current.type()) {
                 case COMMA -> {
                     while ((!auxStack.isEmpty())
-                            && (auxStack.top().getType() != TokenType.CLOSED_PARENTHESIS)
-                            && (auxStack.top().getType() != TokenType.KEYWORD_COMPOUND)) {
-                        resultStack.push(auxStack.top());
+                            && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
+                            && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
+                        resultStack.push(auxStack.pop());
                     }
                 }
                 case IDENTIFIER,
@@ -87,6 +87,7 @@ public class TripleStackTokenizer implements Tokenizer {
                         KEYWORD_PRINT,
                         KEYWORD_BRANCH,
                         KEYWORD_IF,
+                        KEYWORD_FORK,
                         KEYWORD_WHILE,
                         KEYWORD_CLOSE_FILE,
                         KEYWORD_READ_FILE,
@@ -96,16 +97,16 @@ public class TripleStackTokenizer implements Tokenizer {
 
                 case KEYWORD_COMPOUND -> {
                     while ((!auxStack.isEmpty())
-                            && (auxStack.top().getType() != TokenType.CLOSED_PARENTHESIS)
-                            && (auxStack.top().getType() != TokenType.KEYWORD_COMPOUND)) {
+                            && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
+                            && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
                         resultStack.push(auxStack.pop());
                     }
-                    if (!auxStack.isEmpty() && auxStack.top().getType() == TokenType.KEYWORD_COMPOUND)
+                    if (!auxStack.isEmpty() && auxStack.top().type() == TokenType.KEYWORD_COMPOUND)
                         resultStack.push(auxStack.pop());
                     auxStack.push(current);
                 }
                 case OPEN_PARENTHESIS -> {
-                    while (!auxStack.isEmpty() && auxStack.top().getType() != TokenType.CLOSED_PARENTHESIS)
+                    while (!auxStack.isEmpty() && auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
                         resultStack.push(auxStack.pop());
                     if (auxStack.isEmpty())
                         throw new TokenizerException("Unbalanced parentheses -- extra open p.");
@@ -117,14 +118,14 @@ public class TripleStackTokenizer implements Tokenizer {
                         ASSIGNMENT_OP,
                         RELATIONAL_OP,
                         LOGICAL_OP -> {
-                    while (!auxStack.isEmpty() && auxStack.top().getType().compare(current.getType()))
+                    while (!auxStack.isEmpty() && auxStack.top().type().compare(current.type()))
                         resultStack.push(auxStack.pop());
                     auxStack.push(current);
                 }
             }
         }
         while (!auxStack.isEmpty()) {
-            if (auxStack.top().getType() == TokenType.CLOSED_PARENTHESIS)
+            if (auxStack.top().type() == TokenType.CLOSED_PARENTHESIS)
                 throw new TokenizerException("Unbalanced parentheses -- extra closed p.");
             else resultStack.push(auxStack.pop());
         }

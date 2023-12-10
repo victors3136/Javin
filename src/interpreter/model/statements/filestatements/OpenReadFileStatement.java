@@ -38,7 +38,7 @@ public class OpenReadFileStatement implements Statement {
         } catch (FileNotFoundException e) {
             throw new StatementException(e.getMessage());
         }
-        return state;
+        return null;
     }
 
     @Override

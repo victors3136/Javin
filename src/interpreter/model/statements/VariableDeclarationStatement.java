@@ -17,7 +17,7 @@ public class VariableDeclarationStatement implements Statement {
     @Override
     public ProgramState execute(ProgramState state) throws SymbolTableException {
         state.getSymbolTable().put(identifier, type.getDefault());
-        return state;
+        return null;
     }
 
     @Override

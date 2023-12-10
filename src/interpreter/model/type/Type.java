@@ -9,6 +9,5 @@ public sealed interface Type extends DeepCopiable permits BoolType, IntType, Ref
     Value getDefault();
     String toString();
     TypeToken getToken();
-
     Type deepCopy();
 }
