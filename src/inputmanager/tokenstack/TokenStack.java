@@ -44,7 +44,7 @@ public class TokenStack implements Stack<Token>{
     public String toString(){
         StringBuilder buffer = new StringBuilder();
         for(Token t: storage){
-            buffer.append(t.getSequence()).append(" ");
+            buffer.append(t.sequence()).append(" ");
         }
         return buffer.toString();
     }

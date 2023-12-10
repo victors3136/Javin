@@ -19,7 +19,7 @@ public class PrintStatement implements Statement {
         if(outputList == null)
             return state;
         outputList.append(expressionToPrint.evaluate(state));
-        return state;
+        return null;
     }
 
     @Override

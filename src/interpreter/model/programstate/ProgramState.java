@@ -11,18 +11,22 @@ import interpreter.model.values.Value;
 
 public interface ProgramState {
 
+    @SuppressWarnings("unused")
     void setOutputList(OutputList<Value> outputList);
 
     OutputList<Value> getOutputList();
 
+    @SuppressWarnings("unused")
     void setExecutionStack(ExecutionStack<Statement> executionStack);
 
     ExecutionStack<Statement> getExecutionStack();
 
+    @SuppressWarnings("unused")
     void setSymbolTable(SymbolTable<String, Value> symbolTable);
 
     SymbolTable<String, Value> getSymbolTable();
 
+    @SuppressWarnings("unused")
     void setFileTable(FileTable fileTable);
 
     FileTable getFileTable();

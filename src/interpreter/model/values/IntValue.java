@@ -12,11 +12,6 @@ public class IntValue implements Value, Numeric<Value>, Additive<Value>, Testabl
 
     final int value;
 
-    public IntValue() {
-        super();
-        value = 0;
-    }
-
     public IntValue(int i) {
         super();
         value = i;

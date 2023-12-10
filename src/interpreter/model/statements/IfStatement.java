@@ -32,7 +32,7 @@ public class IfStatement implements Statement {
         else
             stack.push(branchNegative);
         state.getSymbolTable().incScope();
-        return state;
+        return null;
     }
 
     @Override

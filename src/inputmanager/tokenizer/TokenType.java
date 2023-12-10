@@ -12,6 +12,7 @@ public enum TokenType {
     KEYWORD_BRANCH,
     KEYWORD_PRINT,
     KEYWORD_WHILE,
+    KEYWORD_FORK,
     KEYWORD_HEAP_ALLOC,
     KEYWORD_HEAP_READ,
     KEYWORD_HEAP_WRITE,
@@ -45,6 +46,7 @@ public enum TokenType {
             case KEYWORD_BRANCH -> "clauses";
             case KEYWORD_PRINT -> "print";
             case KEYWORD_WHILE -> "while";
+            case KEYWORD_FORK -> "fork";
             case KEYWORD_HEAP_ALLOC -> "heap_alloc";
             case KEYWORD_HEAP_READ -> "heap_read";
             case KEYWORD_HEAP_WRITE -> "heap_write";
@@ -79,6 +81,7 @@ public enum TokenType {
             case KEYWORD_BRANCH -> "^else\\b";
             case KEYWORD_PRINT -> "^print\\b";
             case KEYWORD_WHILE -> "^while\\b";
+            case KEYWORD_FORK -> "^fork\\b";
             case KEYWORD_HEAP_ALLOC -> "^heap_alloc\\b";
             case KEYWORD_HEAP_READ -> "^heap_read\\b";
             case KEYWORD_HEAP_WRITE -> "^heap_write\\b";
@@ -99,8 +102,9 @@ public enum TokenType {
             case EMPTY -> "^$";
         };
     }
-    private int precedence(){
-        return switch (this){
+
+    private int precedence() {
+        return switch (this) {
             case EXP_OP -> 5;
             case MUL_DIV_OP -> 4;
             case ADD_SUB_OP -> 3;

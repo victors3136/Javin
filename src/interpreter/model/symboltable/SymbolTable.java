@@ -1,11 +1,9 @@
 package interpreter.model.symboltable;
 
 
-import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.SymbolTableException;
 
 import java.util.Collection;
-import java.util.Map;
 
 public interface SymbolTable<Identifier, Value> {
     void put(Identifier identifier, Value value) throws SymbolTableException;

@@ -8,6 +8,7 @@ import interpreter.model.values.operationinterfaces.Testable;
 import interpreter.model.values.operationinterfaces.Comparable;
 import java.util.Objects;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class StringValue implements Value, Additive<Value>, Comparable<Value>, Testable<Value> {
     final String value;
     public StringValue(String value) {
@@ -22,9 +23,6 @@ public class StringValue implements Value, Additive<Value>, Comparable<Value>, T
             }
             this.value = buffer.toString();
         }else this.value = value;
-    }
-    public StringValue() {
-        this.value = "";
     }
 
     public String getValue(){

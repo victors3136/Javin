@@ -1,7 +1,5 @@
 package interpreter.view;
 
-import interpreter.repository.RepositoryException;
-
 public abstract class Command {
     private final String key;
     private final String description;

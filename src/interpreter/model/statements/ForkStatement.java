@@ -6,14 +6,14 @@ import interpreter.model.programstate.ProgramStateImplementation;
 
 public class ForkStatement implements Statement {
 
-    Statement targetStatement;
+    final Statement targetStatement;
 
-    public ForkStatement(Statement nu) {
-        this.targetStatement = nu;
+    public ForkStatement(Statement target) {
+        this.targetStatement = target;
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, HeapException {
+    public ProgramState execute(ProgramState state) {
         return ProgramStateImplementation.forkProgram(targetStatement, state);
     }
 
@@ -24,6 +24,6 @@ public class ForkStatement implements Statement {
 
     @Override
     public String toString() {
-        return "";
+        return "fork(%s)".formatted(targetStatement.toString());
     }
 }

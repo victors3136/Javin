@@ -26,7 +26,7 @@ public class AssignStatement implements Statement {
         if (!rightHandSide.getType().equals(variablePreassignedType))
             throw new StatementException("Unmatched value-type combination -- " + rightHandSide + " and " + variablePreassignedType);
         state.getSymbolTable().update(variableIdentifier, rightHandSide);
-        return state;
+        return null;
     }
 
     @Override

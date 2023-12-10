@@ -50,7 +50,7 @@ public class ReadFileStatement implements Statement {
                         throw new StatementException("Cannot assign " + processed + " to a null type -- " + this.identifier);
             }
         }
-        return state;
+        return null;
     }
 
     @Override
