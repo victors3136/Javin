@@ -10,7 +10,9 @@ Should be in a fully functional state by February 2024, after the end of the sem
  - Conditional Statements (if)  
  - Repetitive Statements (while)  
  - Variable Scoping  
- - Heap Management and Garbage Collection  
+ - Heap Management and Garbage Collection
+ - Concurrency
 
 *Up next:*  
- - Concurrency  
+ - Typechecking
+ - GUI using JavaFX  
