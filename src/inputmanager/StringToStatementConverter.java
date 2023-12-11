@@ -6,5 +6,5 @@ import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.ExpressionException;
 
 public interface StringToStatementConverter {
-    Statement program(String source) throws TokenizerException, ParseException, ExpressionException;
+    Statement program(String source) throws TokenizerException, ParseException;
 }

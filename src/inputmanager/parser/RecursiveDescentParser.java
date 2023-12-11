@@ -30,13 +30,13 @@ public class RecursiveDescentParser implements Parser {
         else this.lookahead = tokens.pop();
     }
 
-    public Statement program(TokenStack tokens) throws ParseException, ExpressionException {
+    public Statement program(TokenStack tokens) throws ParseException {
         this.tokens = tokens;
         this.lookahead = this.tokens.pop();
         return statement();
     }
 
-    private Statement statement() throws ParseException, ExpressionException {
+    private Statement statement() throws ParseException {
         if (this.lookahead == null)
             return new NoOperationStatement();
         switch (this.lookahead.type()) {
@@ -111,7 +111,7 @@ public class RecursiveDescentParser implements Parser {
         return id;
     }
 
-    private Expression expression() throws ParseException, ExpressionException {
+    private Expression expression() throws ParseException {
         switch (this.lookahead.type()) {
             case EXP_OP, MUL_DIV_OP, ADD_SUB_OP -> {
                 return new ArithmeticExpression(arithmeticOperand(), expression(), expression());
@@ -169,8 +169,7 @@ public class RecursiveDescentParser implements Parser {
             case ">" -> Operand.GREATER;
             case "<=" -> Operand.LOWER_OR_EQUAL;
             case ">=" -> Operand.GREATER_OR_EQUAL;
-            default ->
-                    throw new ParseException("Invalid operand for relexp -- %s".formatted(previousToken.sequence()));
+            default -> throw new ParseException("Invalid operand for relexp -- %s".formatted(previousToken.sequence()));
         };
     }
 

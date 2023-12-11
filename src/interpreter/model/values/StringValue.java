@@ -1,7 +1,7 @@
 package interpreter.model.values;
 
 import interpreter.model.exceptions.ValueException;
-import interpreter.model.type.IntType;
+import interpreter.model.type.StringType;
 import interpreter.model.type.Type;
 import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Testable;
@@ -30,7 +30,7 @@ public class StringValue implements Value, Additive<Value>, Comparable<Value>, T
     }
     @Override
     public Type getType(){
-        return IntType.get();
+        return StringType.get();
     }
 
     @Override

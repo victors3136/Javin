@@ -8,7 +8,6 @@ import interpreter.model.exceptions.TypecheckException;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.programstate.ProgramStateImplementation;
 import interpreter.model.statements.*;
-import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.symboltable.SymbolTableHashMap;
 import interpreter.repository.Repository;
 import interpreter.repository.RepositoryVector;
@@ -30,15 +29,15 @@ public class Application {
             Statement program;
             try {
                 program = inputManager.program(source);
-            } catch (TokenizerException | ParseException | ExpressionException e) {
+            } catch (TokenizerException | ParseException e) {
                 System.err.println(e.getMessage());
                 continue;
             }
             try {
                 program.typecheck(new SymbolTableHashMap<>());
-                continue;
             } catch (TypecheckException e) {
                 System.err.println(e.getMessage());
+                continue;
             }
             ProgramState programState = new ProgramStateImplementation(program);
             Repository repository = new RepositoryVector("logs/log%d.txt".formatted(counter));

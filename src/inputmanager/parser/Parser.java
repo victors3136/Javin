@@ -5,5 +5,5 @@ import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.ExpressionException;
 
 public interface Parser {
-    Statement program(TokenStack tokens) throws ParseException, ExpressionException;
+    Statement program(TokenStack tokens) throws ParseException;
 }

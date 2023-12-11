@@ -35,7 +35,7 @@ public class WhileStatement implements Statement {
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
         Type type = condition.typecheck(environment);
         if (!(type instanceof BoolType))
-            throw new TypecheckException("Condition inside 'if' statement does not eval to a boolean -- %s".formatted(type));
+            throw new TypecheckException("Condition inside 'while' statement does not eval to a boolean -- instead %s evaluates to a %s".formatted(condition,type));
         body.typecheck(environment.deepCopy()); /// WHY???
         return environment;
     }

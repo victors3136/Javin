@@ -35,8 +35,8 @@ public class AssignStatement implements Statement {
         Type expType = expressionAssignedToVar.typecheck(environment);
         if (varType == null)
             throw new TypecheckException("Implicit declaration of a variable -- %s".formatted(variableIdentifier));
-        if(!varType.equals(expType)){
-            throw new TypecheckException("Assignment -- mismatched lhs type (%s) and rhs type (%s)".formatted(varType, expType));
+        if (varType != expType) {
+            throw new TypecheckException("Assignment -- mismatched lhs type ( %s -- %s) and rhs type ( %s -- %s)".formatted(variableIdentifier, varType, expressionAssignedToVar, expType));
         }
         return environment;
     }

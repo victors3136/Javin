@@ -18,10 +18,7 @@ public class VariableExpression implements Expression {
 
     @Override
     public Value evaluate(ProgramState state) throws ValueException, SymbolTableException {
-        Value lookup = state.getSymbolTable().lookup(identifier);
-        if (lookup == null)
-            throw new ValueException("Unable to evaluate the identifier -- " + identifier);
-        return lookup;
+        return state.getSymbolTable().lookup(identifier);
     }
 
     @Override

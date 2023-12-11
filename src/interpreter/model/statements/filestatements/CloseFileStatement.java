@@ -40,7 +40,7 @@ public class CloseFileStatement implements Statement {
     @Override
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
         Type type = filenameExpression.typecheck(environment);
-        if (!(type instanceof StringValue)) {
+        if (!(type.getDefault() instanceof StringValue)) {
             throw new TypecheckException("Argument given to an CloseFileStatement must evaluate to a string");
         }
         return environment;

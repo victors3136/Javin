@@ -16,19 +16,15 @@ public class ArithmeticExpression implements Expression {
     Expression firstExpression, secondExpression;
     Operand operand;
 
-    public ArithmeticExpression(Expression firstExpression, Expression secondExpression, Operand operand) throws ExpressionException {
+    public ArithmeticExpression(Expression firstExpression, Expression secondExpression, Operand operand) {
         super();
-        if (!operand.arithmetic())
-            throw new ExpressionException("Operand provided does not fit an arithmetic expression -- " + operand);
         this.firstExpression = firstExpression;
         this.secondExpression = secondExpression;
         this.operand = operand;
     }
 
-    public ArithmeticExpression(Operand operand, Expression firstExpression, Expression secondExpression) throws ExpressionException {
+    public ArithmeticExpression(Operand operand, Expression firstExpression, Expression secondExpression) {
         super();
-        if (!operand.arithmetic())
-            throw new ExpressionException("Operand provided does not fit an arithmetic expression -- " + operand);
         this.operand = operand;
         this.firstExpression = firstExpression;
         this.secondExpression = secondExpression;
@@ -36,45 +32,41 @@ public class ArithmeticExpression implements Expression {
 
 
     @Override
-    @SuppressWarnings("rawtypes")
     public Value evaluate(ProgramState state) throws ExpressionException, ValueException, HeapException, SymbolTableException {
-        Value firstValue = firstExpression.evaluate(state);
-
-        if (operand == ADD && firstValue instanceof Additive additiveCast) {
-            Value secondValue = secondExpression.evaluate(state);
-            return (Value) additiveCast.add(secondValue);
+        if (operand == ADD) {
+            Additive firstValue = (Additive) firstExpression.evaluate(state);
+            Additive secondValue = (Additive) secondExpression.evaluate(state);
+            return (Value) firstValue.add(secondValue);
         }
-        if (firstValue instanceof Numeric numericCast) {
-            Value secondValue = secondExpression.evaluate(state);
-            return switch (operand) {
-                case SUB -> (Value) numericCast.sub(secondValue);
-                case MUL -> (Value) numericCast.mul(secondValue);
-                case DIV -> (Value) numericCast.div(secondValue);
-                case EXP -> (Value) numericCast.exp(secondValue);
-                default -> throw new ExpressionException("Unaccepted operand type");
-            };
-        } else
-            throw new ExpressionException("First expression does not evaluate to a value suitable for the provided operand --" + firstExpression.toString() + ", operand " + operand.toString());
+        Numeric secondValue = (Numeric) secondExpression.evaluate(state);
+        return switch (operand) {
+            case SUB -> (Value) secondValue.sub(secondValue);
+            case DIV -> (Value) secondValue.div(secondValue);
+            case MUL -> (Value) secondValue.mul(secondValue);
+            case EXP -> (Value) secondValue.exp(secondValue);
+            default -> null;
+        };
     }
 
     @Override
     public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
         Type t1 = firstExpression.typecheck(environment),
                 t2 = secondExpression.typecheck(environment);
-        if (!t1.equals(t2))
+        if (t1 != t2)
             throw new TypecheckException("Mismatched types -- %s, %s".formatted(t1, t2));
         switch (operand) {
             case ADD -> {
-                if (t1.getDefault() instanceof Additive)
+                if (!(t1.getDefault() instanceof Additive))
                     throw new TypecheckException("Expression does not evaluate to an additive type -- %s".formatted(t1));
                 return t1;
             }
-            case SUB, MUL, DIV ->{
-                if (t1.getDefault() instanceof Numeric)
+            case SUB, MUL, DIV, EXP -> {
+                if (!(t1.getDefault() instanceof Numeric))
                     throw new TypecheckException("Expression does not evaluate to a numeric type -- %s".formatted(t1));
                 return t1;
             }
-            default -> throw new TypecheckException("Unaccepted operand type for arithmetic expression -- %s".formatted(operand));
+            default ->
+                    throw new TypecheckException("Unaccepted operand type for arithmetic expression -- %s".formatted(operand));
         }
     }
 

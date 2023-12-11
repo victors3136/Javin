@@ -5,14 +5,15 @@ import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 
-public class ValueExpression implements Expression{
+public class ValueExpression implements Expression {
     final Value value;
 
 
-    public ValueExpression(Value value){
+    public ValueExpression(Value value) {
         super();
         this.value = value;
     }
+
     @Override
     public Value evaluate(ProgramState state) {
         return value;
@@ -28,7 +29,7 @@ public class ValueExpression implements Expression{
         return new ValueExpression(value.deepCopy());
     }
 
-    public String toString(){
-        return value.toString() ;
+    public String toString() {
+        return value.toString();
     }
 }

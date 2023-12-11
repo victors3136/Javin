@@ -17,7 +17,7 @@ public class InputManager implements StringToStatementConverter {
     }
 
     @Override
-    public Statement program(String source) throws TokenizerException, ParseException, ExpressionException {
+    public Statement program(String source) throws TokenizerException, ParseException {
         return parser.program(tokenizer.tokenize(source));
     }
 

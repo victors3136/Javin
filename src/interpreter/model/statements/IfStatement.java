@@ -40,7 +40,7 @@ public class IfStatement implements Statement {
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
         Type type = condition.typecheck(environment);
         if (!(type instanceof BoolType))
-            throw new TypecheckException("Condition inside 'if' statement does not eval to a boolean -- %s".formatted(type));
+            throw new TypecheckException("Condition inside 'if' statement does not eval to a boolean -- instead %s evaluates to %s".formatted(condition, type));
         branchPositive.typecheck(environment.deepCopy()); /// WHY???
         branchNegative.typecheck(environment.deepCopy());
         return environment;

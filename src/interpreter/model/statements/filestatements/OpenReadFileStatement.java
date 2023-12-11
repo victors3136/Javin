@@ -46,8 +46,8 @@ public class OpenReadFileStatement implements Statement {
     @Override
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
         Type type = filenameExpression.typecheck(environment);
-        if (!(type instanceof StringValue)) {
-            throw new TypecheckException("Argument given to an OpenReadFileStatement must evaluate to a string");
+        if (!(type.getDefault() instanceof StringValue)) {
+            throw new TypecheckException("Argument given to an OpenReadFileStatement must evaluate to a string -- instead %s evaluates to a %s".formatted(filenameExpression, type));
         }
         return environment;
     }

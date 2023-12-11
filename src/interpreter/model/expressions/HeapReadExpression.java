@@ -9,23 +9,21 @@ import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
 public class HeapReadExpression implements Expression {
-    final Expression offsetSpecificationFormula;
+    final Expression offsetSpecificationExpression;
 
-    public HeapReadExpression(Expression offsetSpecificationFormula) {
-        this.offsetSpecificationFormula = offsetSpecificationFormula;
+    public HeapReadExpression(Expression offsetSpecificationExpression) {
+        this.offsetSpecificationExpression = offsetSpecificationExpression;
     }
 
     @Override
     public Value evaluate(ProgramState state) throws ValueException, ExpressionException, HeapException, SymbolTableException {
-        Value val = offsetSpecificationFormula.evaluate(state);
-        if (val instanceof ReferenceValue refVal)
-            return state.getHeapTable().get(refVal.getAddress());
-        throw new ExpressionException("Expression does not evaluate to a ref type -- %s".formatted(offsetSpecificationFormula.toString()));
+        ReferenceValue refVal = (ReferenceValue) offsetSpecificationExpression.evaluate(state);
+        return state.getHeapTable().get(refVal.getAddress());
     }
 
     @Override
     public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
-        Type type = offsetSpecificationFormula.typecheck(environment);
+        Type type = offsetSpecificationExpression.typecheck(environment);
         if(! (type instanceof ReferenceType ref)){
             throw new TypecheckException("Offset specification expression does not evaluate to a reference type-- %s".formatted(type));
         }
@@ -34,11 +32,11 @@ public class HeapReadExpression implements Expression {
 
     @Override
     public Expression deepCopy() throws ExpressionException {
-        return new HeapReadExpression(offsetSpecificationFormula.deepCopy());
+        return new HeapReadExpression(offsetSpecificationExpression.deepCopy());
     }
 
     @Override
     public String toString() {
-        return "heap_read(%s)".formatted(offsetSpecificationFormula.toString());
+        return "heap_read(%s)".formatted(offsetSpecificationExpression.toString());
     }
 }
