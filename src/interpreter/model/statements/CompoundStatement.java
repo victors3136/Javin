@@ -1,7 +1,12 @@
 package interpreter.model.statements;
+import interpreter.model.exceptions.StatementException;
+import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.exceptions.TypecheckException;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.exceptions.ExpressionException;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 
 public class CompoundStatement implements Statement {
     final Statement firstStatement;
@@ -18,6 +23,11 @@ public class CompoundStatement implements Statement {
         executionStack.push(secondStatement);
         executionStack.push(firstStatement);
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        return secondStatement.typecheck(firstStatement.typecheck(environment));
     }
 
     @Override

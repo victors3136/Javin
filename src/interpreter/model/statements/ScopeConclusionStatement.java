@@ -2,6 +2,8 @@ package interpreter.model.statements;
 
 import interpreter.model.exceptions.*;
 import interpreter.model.programstate.ProgramState;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 
 class ScopeConclusionStatement implements Statement {
     @Override
@@ -9,6 +11,11 @@ class ScopeConclusionStatement implements Statement {
         state.getSymbolTable().removeOutOfScopeVariables();
         state.getSymbolTable().decScope();
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) {
+        return environment;
     }
 
     @Override

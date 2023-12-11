@@ -5,6 +5,8 @@ import interpreter.model.filetable.FileTable;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.*;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.StringValue;
 import interpreter.model.values.Value;
 
@@ -14,23 +16,23 @@ import java.io.FileReader;
 
 public class OpenReadFileStatement implements Statement {
     final Expression filenameExpression;
-    public OpenReadFileStatement(Expression expression){
+
+    public OpenReadFileStatement(Expression expression) {
         this.filenameExpression = expression;
     }
 
 
     @Override
-    public String toString(){
-        return "fopen( "+this.filenameExpression.toString()+" )";
+    public String toString() {
+        return "fopen( " + this.filenameExpression.toString() + " )";
     }
+
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
         FileTable fileTable = state.getFileTable();
-        Value value = filenameExpression.evaluate(state);
-        if(!(value instanceof StringValue string))
-            throw new StatementException("Argument given to an OpenReadFileStatement must evaluate to a string");
-        if(fileTable.lookup(string.getValue())!=null){
-            throw new StatementException("Trying to open a file which was already opened before -- "+ string.getValue());
+        StringValue string = (StringValue) filenameExpression.evaluate(state);
+        if (fileTable.lookup(string.getValue()) != null) {
+            throw new StatementException("Trying to open a file which was already opened before -- " + string.getValue());
         }
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(string.getValue()));
@@ -39,6 +41,15 @@ public class OpenReadFileStatement implements Statement {
             throw new StatementException(e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type type = filenameExpression.typecheck(environment);
+        if (!(type instanceof StringValue)) {
+            throw new TypecheckException("Argument given to an OpenReadFileStatement must evaluate to a string");
+        }
+        return environment;
     }
 
     @Override

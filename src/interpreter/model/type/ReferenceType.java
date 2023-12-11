@@ -15,7 +15,9 @@ public non-sealed class ReferenceType implements Type{
         instances.computeIfAbsent(t, ReferenceType::new);
         return instances.get(t);
     }
-
+    public Type getInner(){
+        return inner;
+    }
     @Override
     public boolean equals(Type other) {
         if(! (other instanceof ReferenceType ref))

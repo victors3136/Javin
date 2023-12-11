@@ -1,13 +1,12 @@
 package interpreter.model.statements.memorystatements;
 
-import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.exceptions.*;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
+import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.ReferenceType;
+import interpreter.model.type.Type;
 import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
@@ -20,18 +19,32 @@ public class HeapWriteStatement implements Statement {
     }
     @Override
     public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, HeapException, SymbolTableException {
-        Value val = state.getSymbolTable().lookup(identifier);
-        if(val == null)
-            throw new ExpressionException("Use of undeclared identifier -- %s".formatted(identifier));
-        if(!(val instanceof ReferenceValue ref)){
-            throw new ExpressionException("Identifier does not name a reference -- %s".formatted(identifier));
-        }
+        ReferenceValue ref = (ReferenceValue) state.getSymbolTable().lookup(identifier);
         Value expr = valueExpr.evaluate(state);
-        if(! ref.getType().equals(ReferenceType.get(expr.getType()))) {
-            throw new ExpressionException("Mismatched types -- %s, %s".formatted(ref.getType(), expr.getType()));
-        }
         state.getHeapTable().update(ref.getAddress(), expr);
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        //noinspection DuplicatedCode
+        Type varType;
+        try {
+            varType = environment.lookup(identifier);
+        } catch (SymbolTableException ste) {
+            throw new TypecheckException(ste.getMessage());
+        }
+        if(varType == null)
+            throw new TypecheckException("Use of undeclared identifier -- %s".formatted(identifier));
+        //noinspection DuplicatedCode
+        if (!(varType instanceof ReferenceType ref)) {
+            throw new TypecheckException("Variable does not reference the heap -- %s".formatted(varType));
+        }
+        Type expType = valueExpr.typecheck(environment);
+        if (ref.getInner() != expType) {
+            throw new TypecheckException("Source and destination do not have the same type -- (%s %s)".formatted(ref.getInner(), expType));
+        }
+        return environment;
     }
 
     @Override

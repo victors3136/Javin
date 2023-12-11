@@ -1,13 +1,17 @@
 package interpreter.model.expressions;
 
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.exceptions.*;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 import interpreter.model.values.operationinterfaces.Comparable;
+import interpreter.model.values.operationinterfaces.Logical;
+import interpreter.model.values.operationinterfaces.Testable;
+
+import static interpreter.model.operands.Operand.AND;
+import static interpreter.model.operands.Operand.OR;
 
 public class RelationalExpression implements Expression {
     Expression firstExpression, secondExpression;
@@ -54,6 +58,28 @@ public class RelationalExpression implements Expression {
             throw new ExpressionException("First expression does not evaluate to a value of type suitable for the provided operand -- %s, operand %s".
                     formatted(firstExpression.toString(), operand.toString()));
         }
+    }
+
+    @Override
+    public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type firstType = firstExpression.typecheck(environment),
+                secondType = secondExpression.typecheck(environment);
+        if (!firstType.equals(secondType))
+            throw new TypecheckException("Mismatched types -- %s, %s".formatted(firstType, secondType));
+        switch (operand){
+            case EQUAL,NOT_EQUAL ->{
+                if (!(firstType.getDefault() instanceof Testable)){
+                    throw new TypecheckException("Expression does not evaluate to a testable type -- %s".formatted(firstType));
+                }
+            }
+            case GREATER, GREATER_OR_EQUAL, LOWER, LOWER_OR_EQUAL ->{
+                if (!(firstType.getDefault() instanceof Comparable)){
+                    throw new TypecheckException("Expression does not evaluate to a comparable type -- %s".formatted(firstType));
+                }
+            }
+            default -> throw new TypecheckException("Unaccepted operand type for a relational expression -- %s".formatted(operand));
+        }
+        return firstType;
     }
 
     @Override

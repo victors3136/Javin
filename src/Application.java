@@ -4,10 +4,12 @@ import inputmanager.parser.ParseException;
 import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
 import interpreter.controller.ControllerImplementation;
+import interpreter.model.exceptions.TypecheckException;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.programstate.ProgramStateImplementation;
 import interpreter.model.statements.*;
 import interpreter.model.exceptions.ExpressionException;
+import interpreter.model.symboltable.SymbolTableHashMap;
 import interpreter.repository.Repository;
 import interpreter.repository.RepositoryVector;
 import interpreter.view.TextMenu;
@@ -18,7 +20,37 @@ public class Application {
     private static final StringToStatementConverter inputManager = new InputManager();
 
     public static void main(String[] args) {
-        String arithmeticAndConditionalSource =
+        TextMenu mainMenu = new TextMenu();
+        mainMenu.addCommand("exit", new ExitCommand("exit", "exit"));
+        int size = 7;
+        String[] sources = new String[size];
+        populateSources(sources);
+        int counter = 1;
+        for (String source : sources) {
+            Statement program;
+            try {
+                program = inputManager.program(source);
+            } catch (TokenizerException | ParseException | ExpressionException e) {
+                System.err.println(e.getMessage());
+                continue;
+            }
+            try {
+                program.typecheck(new SymbolTableHashMap<>());
+                continue;
+            } catch (TypecheckException e) {
+                System.err.println(e.getMessage());
+            }
+            ProgramState programState = new ProgramStateImplementation(program);
+            Repository repository = new RepositoryVector("logs/log%d.txt".formatted(counter));
+            Controller controller = new ControllerImplementation(programState, repository);
+            mainMenu.addCommand(String.valueOf(counter), new RunProgramCommand(String.valueOf(counter), source, controller));
+            counter ++;
+        }
+        mainMenu.show();
+    }
+
+    private static void populateSources(String[] sources) {
+        sources[0] =
                 """
                         int a;
                         str b;
@@ -30,7 +62,7 @@ public class Application {
                         ));
                         print(b)
                         """;
-        String stringConcatSource =
+        sources[1] =
                 """
                         str b;
                         b<-"b";
@@ -40,7 +72,7 @@ public class Application {
                         b3<-bb+b;
                         print(b3)
                         """;
-        String fileOperationSource =
+        sources[2] =
                 """
                         fopen("in.txt");
                         fopen("in2.txt");
@@ -52,7 +84,7 @@ public class Application {
                         fclose("in2.txt");
                         fclose("in.txt")
                         """;
-        String repetitiveInstructionSource =
+        sources[3] =
                 """
                         int counter;
                         counter <- 0;
@@ -72,7 +104,7 @@ public class Application {
                         );
                         print(counter)
                         """;
-        String heapAllocationSource =
+        sources[4] =
                 """
                         ref int a;
                         ref ref int b;
@@ -97,7 +129,7 @@ public class Application {
                         print(heap_read(heap_read(c)));
                         print(heap_read(heap_read(heap_read(c))))
                         """;
-        String garbageCollectSource =
+        sources[5] =
                 """
                         int a;
                         str b;
@@ -122,7 +154,7 @@ public class Application {
                         ref ref int alpha;
                         heap_alloc(v,30)
                         """;
-        String forkSource =
+        sources[6] =
                 """
                         ref int counter;
                         heap_alloc(counter, 0);
@@ -137,55 +169,7 @@ public class Application {
                         );
                         print(heap_read(counter))
                         """;
-        Statement arithmeticAndConditionalTest = null;
-        Statement stringConcatTest = null;
-        Statement fileOperationTest = null;
-        Statement repetitiveInstructionTest = null;
-        Statement heapAllocationTest = null;
-        Statement garbageCollectTest = null;
-        Statement forkTest = null;
-        try {
-            arithmeticAndConditionalTest = inputManager.program(arithmeticAndConditionalSource);
-            stringConcatTest = inputManager.program(stringConcatSource);
-            fileOperationTest = inputManager.program(fileOperationSource);
-            repetitiveInstructionTest = inputManager.program(repetitiveInstructionSource);
-            heapAllocationTest = inputManager.program(heapAllocationSource);
-            garbageCollectTest = inputManager.program(garbageCollectSource);
-            forkTest = inputManager.program(forkSource);
-        } catch (TokenizerException | ParseException | ExpressionException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-        ProgramState programState1 = new ProgramStateImplementation(arithmeticAndConditionalTest);
-        ProgramState programState2 = new ProgramStateImplementation(stringConcatTest);
-        ProgramState programState3 = new ProgramStateImplementation(fileOperationTest);
-        ProgramState programState4 = new ProgramStateImplementation(repetitiveInstructionTest);
-        ProgramState programState5 = new ProgramStateImplementation(heapAllocationTest);
-        ProgramState programState6 = new ProgramStateImplementation(garbageCollectTest);
-        ProgramState programState7 = new ProgramStateImplementation(forkTest);
-        Repository repositoryVector1 = new RepositoryVector("logs/log1.txt");
-        Repository repositoryVector2 = new RepositoryVector("logs/log2.txt");
-        Repository repositoryVector3 = new RepositoryVector("logs/log3.txt");
-        Repository repositoryVector4 = new RepositoryVector("logs/log4.txt");
-        Repository repositoryVector5 = new RepositoryVector("logs/log5.txt");
-        Repository repositoryVector6 = new RepositoryVector("logs/log6.txt");
-        Repository repositoryVector7 = new RepositoryVector("logs/log7.txt");
-        Controller controller1 = new ControllerImplementation(programState1, repositoryVector1);
-        Controller controller2 = new ControllerImplementation(programState2, repositoryVector2);
-        Controller controller3 = new ControllerImplementation(programState3, repositoryVector3);
-        Controller controller4 = new ControllerImplementation(programState4, repositoryVector4);
-        Controller controller5 = new ControllerImplementation(programState5, repositoryVector5);
-        Controller controller6 = new ControllerImplementation(programState6, repositoryVector6);
-        Controller controller7 = new ControllerImplementation(programState7, repositoryVector7);
-        TextMenu mainMenu = new TextMenu();
-        mainMenu.addCommand("exit", new ExitCommand("exit", "exit"));
-        mainMenu.addCommand("1", new RunProgramCommand("1", arithmeticAndConditionalSource, controller1));
-        mainMenu.addCommand("2", new RunProgramCommand("2", stringConcatSource, controller2));
-        mainMenu.addCommand("3", new RunProgramCommand("3", fileOperationSource, controller3));
-        mainMenu.addCommand("4", new RunProgramCommand("4", repetitiveInstructionSource, controller4));
-        mainMenu.addCommand("5", new RunProgramCommand("5", heapAllocationSource, controller5));
-        mainMenu.addCommand("6", new RunProgramCommand("6", garbageCollectSource, controller6));
-        mainMenu.addCommand("7", new RunProgramCommand("7", forkSource, controller7));
-        mainMenu.show();
+
     }
+
 }

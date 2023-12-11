@@ -1,10 +1,10 @@
 package interpreter.model.expressions;
 
-import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.exceptions.*;
 import interpreter.model.programstate.ProgramState;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.ReferenceType;
+import interpreter.model.type.Type;
 import interpreter.model.values.ReferenceValue;
 import interpreter.model.values.Value;
 
@@ -21,6 +21,15 @@ public class HeapReadExpression implements Expression {
         if (val instanceof ReferenceValue refVal)
             return state.getHeapTable().get(refVal.getAddress());
         throw new ExpressionException("Expression does not evaluate to a ref type -- %s".formatted(offsetSpecificationFormula.toString()));
+    }
+
+    @Override
+    public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type type = offsetSpecificationFormula.typecheck(environment);
+        if(! (type instanceof ReferenceType ref)){
+            throw new TypecheckException("Offset specification expression does not evaluate to a reference type-- %s".formatted(type));
+        }
+        return ref.getInner();
     }
 
     @Override

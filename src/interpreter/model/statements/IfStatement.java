@@ -4,6 +4,9 @@ import interpreter.model.exceptions.*;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.BoolType;
+import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.Value;
 
@@ -23,16 +26,24 @@ public class IfStatement implements Statement {
         ExecutionStack<Statement> stack = state.getExecutionStack();
         if (stack == null)
             return state;
-        Value conditionValue = condition.evaluate(state);
-        if (!(conditionValue instanceof BoolValue))
-            throw new StatementException("Conditional statement does not evaluate to a boolean ");
+        BoolValue conditionValue = (BoolValue) condition.evaluate(state);
         stack.push(new ScopeConclusionStatement());
-        if (((BoolValue) conditionValue).isTrue())
+        if (conditionValue.isTrue())
             stack.push(branchPositive);
         else
             stack.push(branchNegative);
         state.getSymbolTable().incScope();
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type type = condition.typecheck(environment);
+        if (!(type instanceof BoolType))
+            throw new TypecheckException("Condition inside 'if' statement does not eval to a boolean -- %s".formatted(type));
+        branchPositive.typecheck(environment.deepCopy()); /// WHY???
+        branchNegative.typecheck(environment.deepCopy());
+        return environment;
     }
 
     @Override

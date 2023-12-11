@@ -1,11 +1,10 @@
 package interpreter.model.statements;
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.exceptions.*;
 import interpreter.model.outputlist.OutputList;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.expressions.Expression;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 
 public class PrintStatement implements Statement {
@@ -20,6 +19,12 @@ public class PrintStatement implements Statement {
             return state;
         outputList.append(expressionToPrint.evaluate(state));
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        expressionToPrint.typecheck(environment);
+        return environment;
     }
 
     @Override

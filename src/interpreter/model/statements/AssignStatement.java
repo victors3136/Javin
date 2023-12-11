@@ -3,6 +3,7 @@ package interpreter.model.statements;
 import interpreter.model.exceptions.*;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
+import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 
@@ -19,14 +20,25 @@ public class AssignStatement implements Statement {
     @Override
     public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, StatementException, SymbolTableException, HeapException {
         Value rightHandSide = expressionAssignedToVar.evaluate(state);
-        Value leftHandSide = state.getSymbolTable().lookup(variableIdentifier);
-        if (leftHandSide == null)
-            throw new StatementException("Implicit declaration of a variable -- " + variableIdentifier);
-        Type variablePreassignedType = leftHandSide.getType();
-        if (!rightHandSide.getType().equals(variablePreassignedType))
-            throw new StatementException("Unmatched value-type combination -- " + rightHandSide + " and " + variablePreassignedType);
         state.getSymbolTable().update(variableIdentifier, rightHandSide);
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type varType;
+        try {
+            varType = environment.lookup(variableIdentifier);
+        } catch (SymbolTableException ste) {
+            throw new TypecheckException(ste.getMessage());
+        }
+        Type expType = expressionAssignedToVar.typecheck(environment);
+        if (varType == null)
+            throw new TypecheckException("Implicit declaration of a variable -- %s".formatted(variableIdentifier));
+        if(!varType.equals(expType)){
+            throw new TypecheckException("Assignment -- mismatched lhs type (%s) and rhs type (%s)".formatted(varType, expType));
+        }
+        return environment;
     }
 
     @Override

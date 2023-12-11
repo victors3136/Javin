@@ -5,6 +5,8 @@ import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.exceptions.*;
+import interpreter.model.type.StringType;
+import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
 import interpreter.model.values.IntValue;
 import interpreter.model.values.StringValue;
@@ -28,9 +30,7 @@ public class ReadFileStatement implements Statement {
         if (symbolTable.lookup(this.identifier) == null) {
             throw new StatementException("Unknown identifier -- " + this.identifier);
         }
-        Value value = filenameExpression.evaluate(state);
-        if (!(value instanceof StringValue stringValue))
-            throw new StatementException("File must be referenced through a string name -- got a(n) " + value.getType().toString());
+        StringValue stringValue = (StringValue) filenameExpression.evaluate(state);
         String processed;
         try (BufferedReader reader = state.getFileTable().lookup(stringValue.getValue())) {
             String readString;
@@ -51,6 +51,19 @@ public class ReadFileStatement implements Statement {
             }
         }
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type fileType = filenameExpression.typecheck(environment);
+        try {
+            environment.lookup(identifier);
+        } catch (SymbolTableException ste) {
+            throw new TypecheckException(ste.getMessage());
+        }
+        if (!(fileType instanceof StringType))
+            throw new TypecheckException("File must be referenced through a string name -- got a(n) %s".formatted(fileType.toString()));
+        return environment;
     }
 
     @Override

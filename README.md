@@ -12,7 +12,7 @@ Should be in a fully functional state by February 2024, after the end of the sem
  - Variable Scoping  
  - Heap Management and Garbage Collection
  - Concurrency
+ - Typechecking
 
 *Up next:*  
- - Typechecking
  - GUI using JavaFX  

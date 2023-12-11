@@ -1,13 +1,17 @@
 package interpreter.model.expressions;
 
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.exceptions.*;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.Value;
+import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Logical;
+import interpreter.model.values.operationinterfaces.Numeric;
+
+import static interpreter.model.operands.Operand.AND;
+import static interpreter.model.operands.Operand.OR;
 
 public class LogicExpression implements Expression{
     Expression firstExpression, secondExpression;
@@ -47,6 +51,21 @@ public class LogicExpression implements Expression{
             throw new ExpressionException("First expression does not evaluate to a value of type suitable for the provided operand -- %s, operand %s".
                     formatted(firstExpression.toString(), operand.toString()));
         }
+    }
+
+    @Override
+    public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type firstType = firstExpression.typecheck(environment),
+                secondType = secondExpression.typecheck(environment);
+        if (!firstType.equals(secondType))
+            throw new TypecheckException("Mismatched types -- %s, %s".formatted(firstType, secondType));
+        if ((!(operand == AND)) && (!(operand == OR))) {
+            throw new TypecheckException("Unaccepted operand type for arithmetic expression -- %s".formatted(operand));
+        }
+        if (!(firstType.getDefault() instanceof Logical)){
+            throw new TypecheckException("Expression does not evaluate to a logical type -- %s".formatted(firstType));
+        }
+        return firstType;
     }
 
     @Override

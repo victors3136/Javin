@@ -5,6 +5,8 @@ import interpreter.model.filetable.FileTable;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.statements.Statement;
 import interpreter.model.exceptions.*;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.StringValue;
 import interpreter.model.values.Value;
 
@@ -23,10 +25,8 @@ public class CloseFileStatement implements Statement {
     }
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
-        Value value = filenameExpression.evaluate(state);
-        if(!(value instanceof StringValue))
-            throw new StatementException("Files are identified by strings -- provided "+value.getType());
-        String fileIdentifier = ((StringValue) value).getValue();
+        StringValue string = (StringValue) filenameExpression.evaluate(state);
+        String fileIdentifier = string.getValue();
         FileTable fileTable = state.getFileTable();
         try {
             fileTable.lookup(fileIdentifier).close();
@@ -35,6 +35,15 @@ public class CloseFileStatement implements Statement {
         }
         fileTable.remove(fileIdentifier);
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type type = filenameExpression.typecheck(environment);
+        if (!(type instanceof StringValue)) {
+            throw new TypecheckException("Argument given to an CloseFileStatement must evaluate to a string");
+        }
+        return environment;
     }
 
     @Override

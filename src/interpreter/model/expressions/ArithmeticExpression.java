@@ -1,11 +1,10 @@
 package interpreter.model.expressions;
 
-import interpreter.model.exceptions.HeapException;
-import interpreter.model.exceptions.SymbolTableException;
+import interpreter.model.exceptions.*;
 import interpreter.model.operands.Operand;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.exceptions.ExpressionException;
-import interpreter.model.exceptions.ValueException;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 import interpreter.model.values.operationinterfaces.Additive;
 import interpreter.model.values.operationinterfaces.Numeric;
@@ -56,6 +55,27 @@ public class ArithmeticExpression implements Expression {
             };
         } else
             throw new ExpressionException("First expression does not evaluate to a value suitable for the provided operand --" + firstExpression.toString() + ", operand " + operand.toString());
+    }
+
+    @Override
+    public Type typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type t1 = firstExpression.typecheck(environment),
+                t2 = secondExpression.typecheck(environment);
+        if (!t1.equals(t2))
+            throw new TypecheckException("Mismatched types -- %s, %s".formatted(t1, t2));
+        switch (operand) {
+            case ADD -> {
+                if (t1.getDefault() instanceof Additive)
+                    throw new TypecheckException("Expression does not evaluate to an additive type -- %s".formatted(t1));
+                return t1;
+            }
+            case SUB, MUL, DIV ->{
+                if (t1.getDefault() instanceof Numeric)
+                    throw new TypecheckException("Expression does not evaluate to a numeric type -- %s".formatted(t1));
+                return t1;
+            }
+            default -> throw new TypecheckException("Unaccepted operand type for arithmetic expression -- %s".formatted(operand));
+        }
     }
 
     @Override

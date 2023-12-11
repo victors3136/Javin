@@ -3,8 +3,10 @@ package interpreter.model.statements;
 import interpreter.model.exceptions.*;
 import interpreter.model.expressions.Expression;
 import interpreter.model.programstate.ProgramState;
+import interpreter.model.symboltable.SymbolTable;
+import interpreter.model.type.BoolType;
+import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
-import interpreter.model.values.Value;
 
 public class WhileStatement implements Statement {
     final Expression condition;
@@ -18,10 +20,7 @@ public class WhileStatement implements Statement {
 
     @Override
     public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
-        Value val = condition.evaluate(state);
-        if (!(val instanceof BoolValue condVal)) {
-            throw new StatementException("Condition of while statement is not evaluable to a boolean");
-        }
+        BoolValue condVal = (BoolValue) condition.evaluate(state);
         if (condVal.isTrue()) {
             var stack = state.getExecutionStack();
             stack.push(this);
@@ -30,6 +29,15 @@ public class WhileStatement implements Statement {
             state.getSymbolTable().incScope();
         }
         return null;
+    }
+
+    @Override
+    public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
+        Type type = condition.typecheck(environment);
+        if (!(type instanceof BoolType))
+            throw new TypecheckException("Condition inside 'if' statement does not eval to a boolean -- %s".formatted(type));
+        body.typecheck(environment.deepCopy()); /// WHY???
+        return environment;
     }
 
     @Override
