@@ -31,11 +31,6 @@ public class TokenStack implements Stack<Token>{
     public Token pop() throws EmptyStackException {
         return storage.pop();
     }
-
-    @Override
-    public Collection<Token> getAll() {
-        return storage;
-    }
     @Override
     public void clear(){
         this.storage.clear();

@@ -1,5 +1,4 @@
 package inputmanager.tokenstack;
-import java.util.Collection;
 import java.util.EmptyStackException;
 
 public interface Stack<T> {
@@ -7,7 +6,6 @@ public interface Stack<T> {
     boolean isEmpty();
     T top() throws EmptyStackException;
     T pop() throws EmptyStackException;
-    Collection<T> getAll();
     void clear();
     String toString();
 }

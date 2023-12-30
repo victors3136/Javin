@@ -9,8 +9,6 @@ import interpreter.model.type.Type;
 import interpreter.model.values.Value;
 import interpreter.model.values.operationinterfaces.Logical;
 
-import static interpreter.model.operands.Operand.AND;
-import static interpreter.model.operands.Operand.OR;
 
 public class LogicExpression implements Expression {
     Expression firstExpression, secondExpression;

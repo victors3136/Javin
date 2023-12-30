@@ -7,7 +7,6 @@ import inputmanager.tokenizer.Tokenizer;
 import inputmanager.tokenizer.TokenizerException;
 import inputmanager.tokenizer.TripleStackTokenizer;
 import interpreter.model.statements.Statement;
-import interpreter.model.exceptions.ExpressionException;
 
 public class InputManager implements StringToStatementConverter {
     static final Tokenizer tokenizer = new TripleStackTokenizer();

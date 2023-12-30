@@ -9,7 +9,6 @@ import interpreter.model.statements.*;
 import interpreter.model.statements.filestatements.CloseFileStatement;
 import interpreter.model.statements.filestatements.OpenReadFileStatement;
 import interpreter.model.statements.filestatements.ReadFileStatement;
-import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.statements.memorystatements.HeapAllocationStatement;
 import interpreter.model.statements.memorystatements.HeapWriteStatement;
 import interpreter.model.type.*;

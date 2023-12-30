@@ -6,7 +6,6 @@ import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.BoolType;
 import interpreter.model.type.Type;
-import interpreter.model.values.BoolValue;
 import interpreter.model.values.Value;
 import interpreter.model.values.operationinterfaces.Comparable;
 import interpreter.model.values.operationinterfaces.Testable;
@@ -38,18 +37,18 @@ public class RelationalExpression implements Expression {
             Testable firstValue = (Testable) firstExpression.evaluate(state);
             Value secondValue = secondExpression.evaluate(state);
             return switch (operand) {
-                case EQUAL -> (BoolValue) firstValue.equal(secondValue);
-                case NOT_EQUAL -> (BoolValue) firstValue.notEqual(secondValue);
+                case EQUAL -> firstValue.equal(secondValue);
+                case NOT_EQUAL -> firstValue.notEqual(secondValue);
                 default -> null;
             };
         }
         Comparable firstValue = (Comparable) firstExpression.evaluate(state);
         Value secondValue = secondExpression.evaluate(state);
         return switch (operand) {
-            case GREATER -> (BoolValue) firstValue.greater(secondValue);
-            case LOWER -> (BoolValue) firstValue.lower(secondValue);
-            case GREATER_OR_EQUAL -> (BoolValue) firstValue.greaterOrEqual(secondValue);
-            case LOWER_OR_EQUAL -> (BoolValue) firstValue.lowerOrEqual(secondValue);
+            case GREATER -> firstValue.greater(secondValue);
+            case LOWER -> firstValue.lower(secondValue);
+            case GREATER_OR_EQUAL -> firstValue.greaterOrEqual(secondValue);
+            case LOWER_OR_EQUAL -> firstValue.lowerOrEqual(secondValue);
             default -> null;
         };
     }
