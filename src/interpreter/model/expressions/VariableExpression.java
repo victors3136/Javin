@@ -3,7 +3,6 @@ package interpreter.model.expressions;
 import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.exceptions.TypecheckException;
 import interpreter.model.programstate.ProgramState;
-import interpreter.model.exceptions.ValueException;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
 import interpreter.model.values.Value;
@@ -17,7 +16,7 @@ public class VariableExpression implements Expression {
     }
 
     @Override
-    public Value evaluate(ProgramState state) throws ValueException, SymbolTableException {
+    public Value evaluate(ProgramState state) throws SymbolTableException {
         return state.getSymbolTable().lookup(identifier);
     }
 

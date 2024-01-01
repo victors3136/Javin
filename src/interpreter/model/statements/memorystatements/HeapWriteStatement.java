@@ -27,7 +27,6 @@ public class HeapWriteStatement implements Statement {
 
     @Override
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
-        //noinspection DuplicatedCode
         Type varType;
         try {
             varType = environment.lookup(identifier);

@@ -3,7 +3,6 @@ package inputmanager.tokenstack;
 import inputmanager.tokenizer.Token;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.EmptyStackException;
 
 public class TokenStack implements Stack<Token>{

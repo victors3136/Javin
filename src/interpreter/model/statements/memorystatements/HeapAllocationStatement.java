@@ -20,7 +20,7 @@ public class HeapAllocationStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, SymbolTableException, HeapException {
+    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, SymbolTableException, HeapException {
     //        ReferenceValue refVal = (ReferenceValue) state.getSymbolTable().lookup(identifier);
         Value expr = expression.evaluate(state);
         int address = state.getHeapTable().add(expr);
@@ -30,8 +30,7 @@ public class HeapAllocationStatement implements Statement {
 
     @Override
     public SymbolTable<String, Type> typecheck(SymbolTable<String, Type> environment) throws TypecheckException {
-        //noinspection DuplicatedCode
-        Type varType = null;
+        Type varType;
         try {
             varType = environment.lookup(identifier);
         } catch (SymbolTableException ste) {

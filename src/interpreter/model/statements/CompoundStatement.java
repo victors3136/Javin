@@ -1,6 +1,4 @@
 package interpreter.model.statements;
-import interpreter.model.exceptions.StatementException;
-import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.exceptions.TypecheckException;
 import interpreter.model.executionstack.ExecutionStack;
 import interpreter.model.programstate.ProgramState;

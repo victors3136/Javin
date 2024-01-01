@@ -5,14 +5,7 @@ import inputmanager.StringToStatementConverter;
 import inputmanager.parser.ParseException;
 import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
-import interpreter.controller.ControllerImplementation;
 import interpreter.model.exceptions.TypecheckException;
-import interpreter.model.programstate.ProgramState;
-import interpreter.model.programstate.ProgramStateImplementation;
-import interpreter.model.statements.Statement;
-import interpreter.model.symboltable.SymbolTableHashMap;
-import interpreter.repository.Repository;
-import interpreter.repository.RepositoryVector;
 import interpreter.view.commands.ExitCommand;
 import interpreter.view.commands.RunProgramCommand;
 
@@ -20,6 +13,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static interpreter.view.SourceGenerator.CODE;
+
+@SuppressWarnings("unused")
 public class TextMenu implements Menu {
     private static final StringToStatementConverter inputManager = new InputManager();
     private final Map<String, Command> commands;
@@ -43,15 +39,17 @@ public class TextMenu implements Menu {
 
     private void setup() {
         this.addCommand("exit", new ExitCommand("exit", "exit"));
-        List<String> sources = new ArrayList<>();
-        SourceGenerator.populateList(sources);
+        List<String[]> sources = SourceGenerator.makeList();
         AtomicInteger counter = new AtomicInteger(1);
-        for(String source:sources){
-            Controller controller = inputManager.program(source, counter.get());
-            if(controller == null) {
+        for (String[] source : sources) {
+            Controller controller;
+            try {
+                controller = inputManager.program(source[CODE], counter.get());
+            } catch (TypecheckException | TokenizerException | ParseException err) {
+                System.err.println(err.getMessage());
                 continue;
             }
-            this.addCommand(String.valueOf(counter.get()), new RunProgramCommand(String.valueOf(counter.get()), source, controller));
+            this.addCommand(String.valueOf(counter.get()), new RunProgramCommand(String.valueOf(counter.get()), source[CODE], controller));
             counter.getAndIncrement();
         }
         this.show();

@@ -5,6 +5,6 @@ import interpreter.model.programstate.ProgramState;
 import java.util.List;
 
 public interface Controller {
-    void takeAllSteps();
+    String takeAllSteps();
     List<ProgramState> removeCompletedPrograms(List<ProgramState> input);
 }

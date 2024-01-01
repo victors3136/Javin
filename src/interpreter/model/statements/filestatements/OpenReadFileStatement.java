@@ -8,7 +8,6 @@ import interpreter.model.exceptions.*;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
 import interpreter.model.values.StringValue;
-import interpreter.model.values.Value;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

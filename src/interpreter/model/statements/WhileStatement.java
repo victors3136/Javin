@@ -19,7 +19,7 @@ public class WhileStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
+    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, HeapException, SymbolTableException {
         BoolValue condVal = (BoolValue) condition.evaluate(state);
         if (condVal.isTrue()) {
             var stack = state.getExecutionStack();

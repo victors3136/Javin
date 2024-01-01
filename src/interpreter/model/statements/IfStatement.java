@@ -8,7 +8,6 @@ import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.BoolType;
 import interpreter.model.type.Type;
 import interpreter.model.values.BoolValue;
-import interpreter.model.values.Value;
 
 public class IfStatement implements Statement {
     final Expression condition;
@@ -22,7 +21,7 @@ public class IfStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws StatementException, ValueException, ExpressionException, HeapException, SymbolTableException {
+    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, HeapException, SymbolTableException {
         ExecutionStack<Statement> stack = state.getExecutionStack();
         if (stack == null)
             return state;

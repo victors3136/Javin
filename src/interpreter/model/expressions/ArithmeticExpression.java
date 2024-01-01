@@ -13,8 +13,9 @@ import static interpreter.model.operands.Operand.ADD;
 
 @SuppressWarnings("rawtypes")
 public class ArithmeticExpression implements Expression {
-    Expression firstExpression, secondExpression;
-    Operand operand;
+    final Expression firstExpression;
+    final Expression secondExpression;
+    final Operand operand;
 
     public ArithmeticExpression(Expression firstExpression, Expression secondExpression, Operand operand) {
         super();

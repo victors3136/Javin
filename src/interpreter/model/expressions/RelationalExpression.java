@@ -11,8 +11,9 @@ import interpreter.model.values.operationinterfaces.Comparable;
 import interpreter.model.values.operationinterfaces.Testable;
 
 public class RelationalExpression implements Expression {
-    Expression firstExpression, secondExpression;
-    Operand operand;
+    final Expression firstExpression;
+    final Expression secondExpression;
+    final Operand operand;
 
     public RelationalExpression(Expression firstExpression, Expression secondExpression, Operand operand) {
         super();

@@ -4,7 +4,6 @@ import interpreter.model.exceptions.*;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.programstate.ProgramStateImplementation;
 import interpreter.model.symboltable.SymbolTable;
-import interpreter.model.type.BoolType;
 import interpreter.model.type.Type;
 
 public class ForkStatement implements Statement {

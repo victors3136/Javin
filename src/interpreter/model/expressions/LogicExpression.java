@@ -11,8 +11,9 @@ import interpreter.model.values.operationinterfaces.Logical;
 
 
 public class LogicExpression implements Expression {
-    Expression firstExpression, secondExpression;
-    Operand operand;
+    final Expression firstExpression;
+    final Expression secondExpression;
+    final Operand operand;
 
     public LogicExpression(Expression firstExpression, Expression secondExpression, Operand operand) {
         super();

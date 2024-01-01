@@ -32,9 +32,9 @@ public class ControllerImplementation implements Controller {
             }
         });
         List<Callable<ProgramState>> callList = inputList
-                                                    .stream()
-                                                    .map(program -> (Callable<ProgramState>) (program::takeOneStep))
-                                                    .toList();
+                .stream()
+                .map(program -> (Callable<ProgramState>) (program::takeOneStep))
+                .toList();
         List<ProgramState> newList;
         try {
             newList = executor
@@ -66,7 +66,7 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public void takeAllSteps() {
+    public String takeAllSteps() {
         executor = Executors.newFixedThreadPool(2);
         List<ProgramState> programs = removeCompletedPrograms(repository.getProgramList());
         while (!programs.isEmpty()) {
@@ -75,7 +75,9 @@ public class ControllerImplementation implements Controller {
             programs = removeCompletedPrograms(programs);
         }
         executor.shutdownNow();
+        String output = repository.getProgramList().getFirst().getOutputList().toString();
         repository.setProgramList(programs);
+        return output;
     }
 
     @Override

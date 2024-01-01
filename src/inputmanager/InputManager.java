@@ -26,21 +26,12 @@ public class InputManager implements StringToStatementConverter {
     public Statement parse(String source) throws TokenizerException, ParseException {
         return parser.program(tokenizer.tokenize(source));
     }
+
     @Override
-    public Controller program(String source, int counter){
+    public Controller program(String source, int counter) throws TokenizerException, ParseException, TypecheckException {
         Statement program;
-        try {
-            program = parse(source);
-        } catch (TokenizerException | ParseException e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
-        try {
-            program.typecheck(new SymbolTableHashMap<>());
-        } catch (TypecheckException e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
+        program = parse(source);
+        program.typecheck(new SymbolTableHashMap<>());
         ProgramState programState = new ProgramStateImplementation(program);
         Repository repository = new RepositoryVector("logs/log%d.txt".formatted(counter));
         return new ControllerImplementation(programState, repository);

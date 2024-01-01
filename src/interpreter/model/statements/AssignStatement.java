@@ -18,7 +18,7 @@ public class AssignStatement implements Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, StatementException, SymbolTableException, HeapException {
+    public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, SymbolTableException, HeapException {
         Value rightHandSide = expressionAssignedToVar.evaluate(state);
         state.getSymbolTable().update(variableIdentifier, rightHandSide);
         return null;
