@@ -6,29 +6,33 @@ import interpreter.model.values.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-public non-sealed class ReferenceType implements Type{
+public non-sealed class ReferenceType implements Type {
     final Type inner;
-    final static Map<Type,ReferenceType> instances = new HashMap<>();
+    final static Map<Type, ReferenceType> instances = new HashMap<>();
 
-    private ReferenceType(Type t){ inner = t; }
-    static public Type get(Type t){
+    private ReferenceType(Type t) {
+        inner = t;
+    }
+
+    static public Type get(Type t) {
         instances.computeIfAbsent(t, ReferenceType::new);
         return instances.get(t);
     }
-    public Type getInner(){
+
+    public Type getInner() {
         return inner;
     }
+
     @Override
     public boolean equals(Type other) {
-        if(! (other instanceof ReferenceType ref))
-            return false;
-        return this.inner.equals(ref.inner);
+        return (other instanceof ReferenceType ref) && this.inner.equals(ref.inner);
     }
 
     @Override
     public Value getDefault() {
         return new ReferenceValue(0, inner);
     }
+
     @Override
     public TypeToken getToken() {
         return TypeToken.REFERENCE;
@@ -38,8 +42,9 @@ public non-sealed class ReferenceType implements Type{
     public Type deepCopy() {
         return get(inner);
     }
+
     @Override
-    public String toString(){
-        return "ref "+ inner.toString();
+    public String toString() {
+        return "ref " + inner.toString();
     }
 }

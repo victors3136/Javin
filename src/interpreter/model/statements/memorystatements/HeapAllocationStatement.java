@@ -21,7 +21,7 @@ public class HeapAllocationStatement implements Statement {
 
     @Override
     public ProgramState execute(ProgramState state) throws ValueException, ExpressionException, SymbolTableException, HeapException {
-    //        ReferenceValue refVal = (ReferenceValue) state.getSymbolTable().lookup(identifier);
+        //        ReferenceValue refVal = (ReferenceValue) state.getSymbolTable().lookup(identifier);
         Value expr = expression.evaluate(state);
         int address = state.getHeapTable().add(expr);
         state.getSymbolTable().update(identifier, new ReferenceValue(address, expr.getType()));
@@ -45,7 +45,8 @@ public class HeapAllocationStatement implements Statement {
         }
         Type expType = expression.typecheck(environment);
         if (ref.getInner() != expType) {
-            throw new TypecheckException("Source and destination do not have the same type -- (%s %s)".formatted(ref.getInner(), expType));
+            throw new TypecheckException("Source and destination do not have the same type -- (%s %s)"
+                    .formatted(ref.getInner(), expType));
         }
         return environment;
     }

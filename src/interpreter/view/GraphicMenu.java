@@ -7,6 +7,7 @@ import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
 import interpreter.model.exceptions.TypecheckException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -31,15 +32,15 @@ public class GraphicMenu extends Application implements Menu {
     private Scene scene;
     private TextField programNameField;
     private TextArea codeBox, outputBox;
-    private Button submitButton, runButton;
+    private Button submitButton, runButton, exitButton;
     private static final double pageWidth = 600;
     private static final double pageHeight = 600;
     private static final double defaultSpacing = 5;
-    private final Map<String, String> nameToCode = new HashMap<>();
-    private final Map<String, Controller> nameToProgram = new HashMap<>();
+    private final Map<String, String> programNameToSourceCode = new HashMap<>();
+    private final Map<String, Controller> programNameToExecutable = new HashMap<>();
     private List<String[]> sources = SourceGenerator.makeList();
-    private final AtomicInteger counter = new AtomicInteger(1);
-    private ListView<String> programList;
+    private final AtomicInteger logFileCounter = new AtomicInteger(1);
+    private ListView<String> runnableProgramsDisplayList;
 
     @Override
     public void show() {
@@ -64,19 +65,11 @@ public class GraphicMenu extends Application implements Menu {
 
     private void addPrograms() {
         for (String[] source : sources) {
-            Controller controller;
-            try {
-                controller = inputManager.program(source[CODE], counter.getAndIncrement());
-            } catch (TypecheckException | TokenizerException | ParseException err) {
-                showErrorMessageBox(err.getMessage());
+            Controller controller = parseAndCreateExecutableProgram(source[CODE], logFileCounter);
+            if (controller == null)
                 continue;
-            }
-            if (nameToCode.get(source[NAME]) != null) {
-                showErrorMessageBox("Program names must be unique!");
-                continue;
-            }
-            nameToCode.put(source[NAME], source[CODE]);
-            nameToProgram.put(source[NAME], controller);
+            programNameToSourceCode.put(source[NAME], source[CODE]);
+            programNameToExecutable.put(source[NAME], controller);
         }
     }
 
@@ -85,14 +78,16 @@ public class GraphicMenu extends Application implements Menu {
         scene = new Scene(pageLayout, pageWidth, pageHeight);
         codeBox = new TextArea();
         codeBox.setPromptText("input a program...");
-        outputBox = new TextArea();
-        outputBox.setPromptText("output will appear here");
+        codeBox.wrapTextProperty().set(true);
+        outputBox = new TextArea("output will appear here");
         outputBox.setEditable(false);
+        outputBox.wrapTextProperty().set(true);
         programNameField = new TextField();
-        programNameField.setPromptText("enter a program name");
+        programNameField.setPromptText("enter a name for the program!");
         submitButton = new Button("Submit");
         runButton = new Button("Run");
-        programList = new ListView<>();
+        exitButton = new Button("Exit");
+        runnableProgramsDisplayList = new ListView<>();
     }
 
     private void setupPage(Stage stage) {
@@ -104,11 +99,16 @@ public class GraphicMenu extends Application implements Menu {
         stage.getIcons().add(icon);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private void addNodes() {
         HBox header = new HBox();
         header.setPadding(new Insets(2 * defaultSpacing));
         header.setSpacing(2 * defaultSpacing);
-        ImageView headerImage = new ImageView(new Image(new File("images\\header.png").toURI().toString()));
+        ImageView headerImage = new ImageView(
+                new Image(
+                        new File("images\\header.png")
+                                .toURI()
+                                .toString()));
         headerImage.setAccessibleText("Pristine landscape");
         header.getChildren().add(headerImage);
 
@@ -133,19 +133,20 @@ public class GraphicMenu extends Application implements Menu {
         VBox right = new VBox();
         right.setSpacing(defaultSpacing);
         right.setAlignment(Pos.CENTER);
-        programList.setPrefWidth(pageWidth / 2);
-        programList.setPrefHeight(pageHeight * 2 / 3);
+        runnableProgramsDisplayList.setPrefWidth(pageWidth / 2);
+        runnableProgramsDisplayList.setPrefHeight(pageHeight * 2 / 3);
         runButton.setPrefWidth(pageWidth / 2);
-        right.getChildren().addAll(programList, runButton);
+        right.getChildren().addAll(runnableProgramsDisplayList, runButton);
         topCenter.getChildren().add(right);
         main.getChildren().add(topCenter);
 
-        HBox bottom = new HBox();
+        VBox bottom = new VBox();
         bottom.setSpacing(defaultSpacing);
         bottom.setAlignment(Pos.BOTTOM_CENTER);
         outputBox.setPrefWidth(pageWidth);
-        outputBox.setPrefHeight(pageWidth / 4);
-        bottom.getChildren().add(outputBox);
+        outputBox.setPrefHeight(pageWidth / 2);
+        exitButton.setPrefWidth(pageWidth);
+        bottom.getChildren().addAll(outputBox, exitButton);
 
         main.getChildren().add(bottom);
         pageLayout.setTop(header);
@@ -153,56 +154,70 @@ public class GraphicMenu extends Application implements Menu {
     }
 
     private void populateProgramList() {
-        programList.getItems().clear();
+        runnableProgramsDisplayList.getItems().clear();
         for (String[] srcCode : sources) {
-            programList.getItems().add(srcCode[NAME]);
+            runnableProgramsDisplayList.getItems().add(srcCode[NAME]);
         }
     }
 
     private void registerHandlers() {
         submitButton.setOnAction(event -> {
             String name = programNameField.getText();
-            if (nameToCode.get(name) != null) {
+            if (programNameToSourceCode.get(name) != null) {
                 showErrorMessageBox("Duplicate program name");
                 return;
             }
             String code = codeBox.getText();
-            Controller program;
-            try {
-                program = inputManager.program(code, counter.getAndIncrement());
-            } catch (TypecheckException | TokenizerException | ParseException e) {
-                showErrorMessageBox(e.getMessage());
+            Controller program = parseAndCreateExecutableProgram(code, logFileCounter);
+            if (program == null)
                 return;
-            }
-            nameToProgram.put(name, program);
-            nameToCode.put(name, code);
-            programList.getItems().add(name);
+            programNameToExecutable.put(name, program);
+            programNameToSourceCode.put(name, code);
+            runnableProgramsDisplayList.getItems().add(name);
         });
 
         runButton.setOnAction(event -> {
-            String name = programList.getSelectionModel().getSelectedItem();
+            String name = runnableProgramsDisplayList.getSelectionModel().getSelectedItem();
             if (name == null) {
                 showErrorMessageBox("No item selected");
                 return;
             }
-            String output = nameToProgram.get(name).takeAllSteps();
-            nameToProgram.remove(name);
-            nameToCode.remove(name);
-            programList.getItems().remove(name);
-            programList.getSelectionModel().clearSelection();
+            String output = programNameToExecutable.get(name).takeAllSteps();
+            programNameToExecutable.remove(name);
+            programNameToSourceCode.remove(name);
+            runnableProgramsDisplayList.getItems().remove(name);
+            runnableProgramsDisplayList.getSelectionModel().clearSelection();
             sources = sources.stream().filter(p -> !Objects.equals(p[NAME], name)).toList();
             outputBox.setText(output);
         });
-        programList.setOnMouseClicked(event->{
-            String programName = programList.getSelectionModel().getSelectedItem();
+
+        runnableProgramsDisplayList.setOnMouseClicked(event -> {
+            String programName = runnableProgramsDisplayList.getSelectionModel().getSelectedItem();
             if (programName == null)
                 return;
             programNameField.setText(programName);
-            codeBox.setText(nameToCode.get(programName));
+            codeBox.setText(programNameToSourceCode.get(programName));
         });
+
+        exitButton.setOnAction(event -> Platform.exit());
     }
 
-    private void showErrorMessageBox(String warning) {
+    private static Controller parseAndCreateExecutableProgram(String code, AtomicInteger logFileCounter) {
+        try {
+            return inputManager.program(code, logFileCounter.getAndIncrement());
+        } catch (TypecheckException e) {
+            showErrorMessageBox("Typechecking error: " + e.getMessage());
+            return null;
+        } catch (TokenizerException e) {
+            showErrorMessageBox("Tokenizing error: " + e.getMessage());
+            return null;
+        } catch (ParseException e) {
+            showErrorMessageBox("Parsing exception: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static void showErrorMessageBox(String warning) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setContentText(warning);
