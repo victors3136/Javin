@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,7 +33,7 @@ public class GraphicMenu extends Application implements Menu {
     private TextArea codeBox, outputBox;
     private Button submitButton, runButton;
     private static final double pageWidth = 600;
-    private static final double pageHeight = 400;
+    private static final double pageHeight = 600;
     private static final double defaultSpacing = 5;
     private final Map<String, String> nameToCode = new HashMap<>();
     private final Map<String, Controller> nameToProgram = new HashMap<>();
@@ -44,10 +45,12 @@ public class GraphicMenu extends Application implements Menu {
     public void show() {
         launch();
     }
+
     @Override
     public void start(Stage stage) {
         initSources();
         initNodes();
+        addPrograms();
         setupPage(stage);
         addNodes();
         populateProgramList();
@@ -57,8 +60,8 @@ public class GraphicMenu extends Application implements Menu {
 
     private void initSources() {
         sources = SourceGenerator.makeList();
-        addPrograms();
     }
+
     private void addPrograms() {
         for (String[] source : sources) {
             Controller controller;
@@ -76,6 +79,7 @@ public class GraphicMenu extends Application implements Menu {
             nameToProgram.put(source[NAME], controller);
         }
     }
+
     private void initNodes() {
         pageLayout = new BorderPane();
         scene = new Scene(pageLayout, pageWidth, pageHeight);
@@ -90,6 +94,7 @@ public class GraphicMenu extends Application implements Menu {
         runButton = new Button("Run");
         programList = new ListView<>();
     }
+
     private void setupPage(Stage stage) {
         stage.setScene(scene);
         stage.setTitle("Parsr");
@@ -98,7 +103,15 @@ public class GraphicMenu extends Application implements Menu {
         Image icon = new Image(file.toURI().toString());
         stage.getIcons().add(icon);
     }
+
     private void addNodes() {
+        HBox header = new HBox();
+        header.setPadding(new Insets(2 * defaultSpacing));
+        header.setSpacing(2 * defaultSpacing);
+        ImageView headerImage = new ImageView(new Image(new File("images\\header.png").toURI().toString()));
+        headerImage.setAccessibleText("Pristine landscape");
+        header.getChildren().add(headerImage);
+
         VBox main = new VBox();
         main.setPadding(new Insets(2 * defaultSpacing));
         main.setSpacing(2 * defaultSpacing);
@@ -112,6 +125,8 @@ public class GraphicMenu extends Application implements Menu {
         left.setAlignment(Pos.CENTER);
         codeBox.setPrefWidth(pageWidth / 2);
         codeBox.setPrefHeight(pageHeight * 2 / 3);
+        programNameField.setPrefWidth(pageWidth / 2);
+        submitButton.setPrefWidth(pageWidth / 2);
         left.getChildren().addAll(codeBox, programNameField, submitButton);
         topCenter.getChildren().add(left);
 
@@ -120,6 +135,7 @@ public class GraphicMenu extends Application implements Menu {
         right.setAlignment(Pos.CENTER);
         programList.setPrefWidth(pageWidth / 2);
         programList.setPrefHeight(pageHeight * 2 / 3);
+        runButton.setPrefWidth(pageWidth / 2);
         right.getChildren().addAll(programList, runButton);
         topCenter.getChildren().add(right);
         main.getChildren().add(topCenter);
@@ -127,17 +143,22 @@ public class GraphicMenu extends Application implements Menu {
         HBox bottom = new HBox();
         bottom.setSpacing(defaultSpacing);
         bottom.setAlignment(Pos.BOTTOM_CENTER);
+        outputBox.setPrefWidth(pageWidth);
+        outputBox.setPrefHeight(pageWidth / 4);
         bottom.getChildren().add(outputBox);
 
         main.getChildren().add(bottom);
+        pageLayout.setTop(header);
         pageLayout.setCenter(main);
     }
+
     private void populateProgramList() {
         programList.getItems().clear();
         for (String[] srcCode : sources) {
             programList.getItems().add(srcCode[NAME]);
         }
     }
+
     private void registerHandlers() {
         submitButton.setOnAction(event -> {
             String name = programNameField.getText();
@@ -168,17 +189,19 @@ public class GraphicMenu extends Application implements Menu {
             nameToProgram.remove(name);
             nameToCode.remove(name);
             programList.getItems().remove(name);
+            programList.getSelectionModel().clearSelection();
             sources = sources.stream().filter(p -> !Objects.equals(p[NAME], name)).toList();
             outputBox.setText(output);
         });
-
-        programList.getSelectionModel().selectedItemProperty().addListener((obs, prev, curr) -> {
-            if (curr == null)
+        programList.setOnMouseClicked(event->{
+            String programName = programList.getSelectionModel().getSelectedItem();
+            if (programName == null)
                 return;
-            programNameField.setText(curr);
-            codeBox.setText(nameToCode.get(curr));
+            programNameField.setText(programName);
+            codeBox.setText(nameToCode.get(programName));
         });
     }
+
     private void showErrorMessageBox(String warning) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

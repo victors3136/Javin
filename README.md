@@ -12,7 +12,8 @@ Should be in a fully functional state by February 2024, after the end of the sem
  - Variable Scoping  
  - Heap Management and Garbage Collection
  - Concurrency
- - Typechecking
+ - Typechecking  
+ - GUI using JavaFX  
 
 *Up next:*  
- - GUI using JavaFX  
+ -Final Exam Requirement
