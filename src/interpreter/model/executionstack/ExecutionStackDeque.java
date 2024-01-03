@@ -3,6 +3,7 @@ package interpreter.model.executionstack;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ExecutionStackDeque<T> implements ExecutionStack<T> {
 
@@ -25,6 +26,11 @@ public class ExecutionStackDeque<T> implements ExecutionStack<T> {
     @Override
     public boolean empty() {
         return storage.isEmpty();
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return storage.stream();
     }
 
     @Override

@@ -22,8 +22,13 @@ public class ControllerImplementation implements Controller {
         this.repository = repository;
         this.repository.add(programState);
     }
+    @Override
+    public String getRepoRepresentation(){
+        return repository.getProgramList().stream().map(p-> p.getExecutionStack().toString()).reduce("", (p1, p2)-> p1 + "\n" + p2);
+    }
 
-    private void takeOneStepForAll(List<ProgramState> inputList) {
+    @Override
+    public Repository takeOneStepForAll(List<ProgramState> inputList) {
         inputList.forEach(program -> {
             try {
                 repository.logProgramStateExecution(program);
@@ -52,7 +57,7 @@ public class ControllerImplementation implements Controller {
                     .toList();
         } catch (InterruptedException err) {
             System.err.println(err.getMessage());
-            return;
+            return null;
         }
         inputList.addAll(newList);
         inputList.forEach(program -> {
@@ -63,6 +68,7 @@ public class ControllerImplementation implements Controller {
             }
         });
         repository.setProgramList(inputList);
+        return repository;
     }
 
     @Override
@@ -88,6 +94,17 @@ public class ControllerImplementation implements Controller {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void removeCompletedPrograms() {
+        repository.setProgramList(removeCompletedPrograms(repository.getProgramList()));
+        repository.getProgramList();
+    }
+
+    @Override
+    public ProgramState getProgram() {
+        return repository.getProgramList().getFirst();
+    }
+
     private Set<Integer> getReachableAddresses() {
         return Stream.concat(
                 /// Reachable addresses from Symbol table
@@ -107,7 +124,8 @@ public class ControllerImplementation implements Controller {
         ).collect(Collectors.toSet());
     }
 
-    private void collectGarbage() {
+    @Override
+    public void collectGarbage() {
         Set<Integer> addresses = this.getReachableAddresses();
         HeapHashTable newHeap = new HeapHashTable(repository
                 .getProgramList()
@@ -125,4 +143,10 @@ public class ControllerImplementation implements Controller {
                 ));
         repository.getProgramList().forEach(program -> program.setHeapTable(newHeap));
     }
+
+    @Override
+    public List<ProgramState> getPrograms() {
+        return repository.getProgramList();
+    }
+
 }

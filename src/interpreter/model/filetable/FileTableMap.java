@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileTableMap implements FileTable {
     final SortedMap<String, BufferedReader> storage;
@@ -35,6 +36,11 @@ public class FileTableMap implements FileTable {
     @Override
     public void remove(String fileIdentifier) {
         storage.remove(fileIdentifier);
+    }
+
+    @Override
+    public Stream<String> stream() {
+        return storage.keySet().stream();
     }
 
 }

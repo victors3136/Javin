@@ -1,14 +1,14 @@
 package interpreter.model.symboltable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.stream.Collectors;
-
 import interpreter.model.exceptions.ExpressionException;
 import interpreter.model.exceptions.SymbolTableException;
 import interpreter.model.utils.DeepCopiable;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implements SymbolTable<Identifier, Value> {
     private static class MyPair<T1 extends DeepCopiable, T2> implements DeepCopiable {
@@ -115,6 +115,26 @@ public class SymbolTableHashMap<Identifier, Value extends DeepCopiable> implemen
                         )
                 );
         return new SymbolTableHashMap<>(copiedStorage, currentScope);
+    }
+
+    @Override
+    public Stream<Map.Entry<Identifier, Value>> stream() {
+        return storage.entrySet().stream().map(entry -> new Map.Entry<>() {
+            @Override
+            public Identifier getKey() {
+                return entry.getKey();
+            }
+
+            @Override
+            public Value getValue() {
+                return entry.getValue().first();
+            }
+
+            @Override
+            public Value setValue(Value value) {
+                return null;
+            }
+        });
     }
 
 

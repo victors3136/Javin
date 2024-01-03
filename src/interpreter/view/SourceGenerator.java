@@ -166,6 +166,31 @@ public class SourceGenerator {
                                 print(heap_read(counter))
                                 """
                 }
+        );list.add(new String[]
+                {
+                        "concurrency2"
+                        ,
+                        """
+                                ref int counter;
+                                heap_alloc(counter, 0);
+                                while(heap_read(counter) < 10)(
+                                    fork(
+                                        print(heap_read(counter));
+                                        fork(
+                                            print(heap_read(counter))
+                                        )
+                                    );
+                                    fork(
+                                        print(heap_read(counter));
+                                        fork(
+                                            print(heap_read(counter))
+                                        )
+                                    );
+                                    heap_write(counter, heap_read(counter) + 1)
+                                );
+                                print(heap_read(counter))
+                                """
+                }
         );
         return list;
     }

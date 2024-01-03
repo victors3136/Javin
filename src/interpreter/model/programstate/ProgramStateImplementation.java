@@ -9,6 +9,7 @@ import interpreter.model.heaptable.HeapHashTable;
 import interpreter.model.heaptable.HeapTable;
 import interpreter.model.outputlist.OutputList;
 import interpreter.model.outputlist.OutputListArray;
+import interpreter.model.statements.NoOperationStatement;
 import interpreter.model.statements.Statement;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.symboltable.SymbolTableHashMap;
@@ -36,7 +37,8 @@ public class ProgramStateImplementation implements ProgramState {
         this.outputList = new OutputListArray<>();
         this.fileTable = new FileTableMap();
         this.heapTable = new HeapHashTable();
-        executionStack.push(originalProgram);
+        this.executionStack.push(new NoOperationStatement());
+        this.executionStack.push(originalProgram);
     }
 
     private ProgramStateImplementation(Statement target, SymbolTable<String, Value> symbolTable, HeapTable heapTable, FileTable fileTable, OutputList<Value> outputList) {
@@ -48,6 +50,7 @@ public class ProgramStateImplementation implements ProgramState {
         this.fileTable = fileTable;
         this.outputList = outputList;
         this.executionStack = new ExecutionStackDeque<>();
+        this.executionStack.push(new NoOperationStatement());
         this.executionStack.push(target);
     }
 
@@ -139,7 +142,7 @@ public class ProgramStateImplementation implements ProgramState {
                 outputList.toString());
     }
 
-    private Integer getID() {
+    public Integer getID() {
         return id;
     }
 }

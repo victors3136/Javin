@@ -1,9 +1,11 @@
-import interpreter.view.GraphicMenu;
+import interpreter.view.CoolGraphicMenu;
 import interpreter.view.Menu;
 
 public class Main {
     public static void main(String[] args) {
-        Menu userGUI = new GraphicMenu();
-        userGUI.show();
+//        Menu userGUI1 = new CoolGraphicMenu();
+        Menu userGUI2 = new CoolGraphicMenu();
+//        userGUI1.show();
+        userGUI2.show();
     }
 }

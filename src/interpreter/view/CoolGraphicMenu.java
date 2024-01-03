@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static interpreter.view.SourceGenerator.CODE;
 import static interpreter.view.SourceGenerator.NAME;
 
-public class GraphicMenu extends Application implements Menu {
+public class CoolGraphicMenu extends Application implements Menu {
     private static final StringToStatementConverter inputManager = new InputManager();
     private BorderPane pageLayout;
     private Scene scene;
@@ -38,7 +38,7 @@ public class GraphicMenu extends Application implements Menu {
     private static final double defaultSpacing = 5;
     private final Map<String, String> programNameToSourceCode = new HashMap<>();
     private final Map<String, Controller> programNameToExecutable = new HashMap<>();
-    private List<String[]> sources = SourceGenerator.makeList();
+    private List<String[]> sources;
     private final AtomicInteger logFileCounter = new AtomicInteger(1);
     private ListView<String> runnableProgramsDisplayList;
 

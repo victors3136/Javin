@@ -4,6 +4,8 @@ package interpreter.model.symboltable;
 import interpreter.model.exceptions.SymbolTableException;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public interface SymbolTable<Identifier, Value> {
     void put(Identifier identifier, Value value) throws SymbolTableException;
@@ -17,4 +19,6 @@ public interface SymbolTable<Identifier, Value> {
     Collection<Value> getValues();
 
     SymbolTable<Identifier,Value> deepCopy();
+
+    Stream<Map.Entry<Identifier, Value>> stream();
 }

@@ -40,4 +40,5 @@ public interface ProgramState {
     ProgramState takeOneStep() throws ProgramStateException, SymbolTableException, StatementException, ValueException, ExpressionException, HeapException;
 
 
+    Integer getID();
 }
