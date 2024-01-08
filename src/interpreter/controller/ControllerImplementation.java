@@ -22,13 +22,9 @@ public class ControllerImplementation implements Controller {
         this.repository = repository;
         this.repository.add(programState);
     }
-    @Override
-    public String getRepoRepresentation(){
-        return repository.getProgramList().stream().map(p-> p.getExecutionStack().toString()).reduce("", (p1, p2)-> p1 + "\n" + p2);
-    }
 
     @Override
-    public Repository takeOneStepForAll(List<ProgramState> inputList) {
+    public void takeOneStepForAll(List<ProgramState> inputList) {
         inputList.forEach(program -> {
             try {
                 repository.logProgramStateExecution(program);
@@ -57,7 +53,7 @@ public class ControllerImplementation implements Controller {
                     .toList();
         } catch (InterruptedException err) {
             System.err.println(err.getMessage());
-            return null;
+            return;
         }
         inputList.addAll(newList);
         inputList.forEach(program -> {
@@ -68,7 +64,6 @@ public class ControllerImplementation implements Controller {
             }
         });
         repository.setProgramList(inputList);
-        return repository;
     }
 
     @Override
@@ -143,10 +138,4 @@ public class ControllerImplementation implements Controller {
                 ));
         repository.getProgramList().forEach(program -> program.setHeapTable(newHeap));
     }
-
-    @Override
-    public List<ProgramState> getPrograms() {
-        return repository.getProgramList();
-    }
-
 }
