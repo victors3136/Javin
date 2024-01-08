@@ -18,5 +18,6 @@ public interface Controller {
 
     void collectGarbage();
 
+    List<ProgramState> getPrograms();
 }
 

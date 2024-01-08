@@ -34,7 +34,7 @@ public class ControllerImplementation implements Controller {
         });
         List<Callable<ProgramState>> callList = inputList
                 .stream()
-                .map(program -> (Callable<ProgramState>) (program::takeOneStep))
+                .map(program -> (Callable<ProgramState>) (program::takeOneStep)) /// How to handle excepts here?
                 .toList();
         List<ProgramState> newList;
         try {
@@ -137,5 +137,10 @@ public class ControllerImplementation implements Controller {
                         )
                 ));
         repository.getProgramList().forEach(program -> program.setHeapTable(newHeap));
+    }
+
+    @Override
+    public List<ProgramState> getPrograms() {
+        return repository.getProgramList();
     }
 }
