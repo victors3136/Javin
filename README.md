@@ -13,7 +13,7 @@ Should be in a fully functional state by February 2024, after the end of the sem
  - Heap Management and Garbage Collection (heap_alloc, heap_write, heap_read)  
  - Concurrency (fork)  
  - Typechecking (done at parsing rather than at runtime)  
- - GUI using JavaFX (add, edit, execute code in a GUI)  
+ - GUI using JavaFX (add, edit, execute and even debug code in a GUI)  
 
 *Up next:*  
  - Final Exam Requirement
