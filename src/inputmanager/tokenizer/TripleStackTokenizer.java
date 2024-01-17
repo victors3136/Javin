@@ -12,7 +12,6 @@ public class TripleStackTokenizer implements Tokenizer {
     private static final Map<TokenType, Pattern> precompiledTokenPatterns = precompileRegularExps();
 
     public TripleStackTokenizer() {
-
     }
 
     public TokenStack tokenize(String source) throws TokenizerException {
@@ -27,27 +26,37 @@ public class TripleStackTokenizer implements Tokenizer {
         return map;
     }
 
+    private static boolean tokenizationConditionForEmptyStatement(TokenStack tokens, TokenType current) {
+        return !tokens.isEmpty() && ((
+                                             tokens.top().type() == TokenType.OPEN_PARENTHESIS
+                                             &&
+                                             current == TokenType.CLOSED_PARENTHESIS
+                                     ) || (
+                                             tokens.top().type() == TokenType.KEYWORD_COMPOUND
+                                             &&
+                                             current == TokenType.KEYWORD_COMPOUND
+                                     ));
+    }
+
     private TokenStack createTokenSequence(String src) throws TokenizerException {
         TokenStack tokenStack = new TokenStack();
-        String source = src.strip();
+        StringBuilder source = new StringBuilder(src.strip());
         tokenStack.clear();
         if (src.isEmpty()) {
-            tokenStack.push(new Token(TokenType.EMPTY, source));
+            tokenStack.push(new Token(TokenType.EMPTY_STATEMENT, source.toString()));
             return tokenStack;
         }
         while (!source.isEmpty()) {
             boolean match = false;
-            for (TokenType tok : tokenTypes) {
-                Matcher result = precompiledTokenPatterns.get(tok).matcher(source);
+            for (TokenType token : tokenTypes) {
+                Matcher result = precompiledTokenPatterns.get(token).matcher(source);
                 if (result.find()) {
                     match = true;
-                    String actualTokenString = result.group().trim();
-                    if (!tokenStack.isEmpty() && ((
-                            tokenStack.top().type() == TokenType.OPEN_PARENTHESIS && tok == TokenType.CLOSED_PARENTHESIS) ||
-                            (tokenStack.top().type() == TokenType.KEYWORD_COMPOUND && tok == TokenType.KEYWORD_COMPOUND)))
-                        tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
-                    tokenStack.push(new Token(tok, actualTokenString));
-                    source = result.replaceFirst("").strip();
+                    String string = result.group().trim();
+                    if (tokenizationConditionForEmptyStatement(tokenStack, token))
+                        tokenStack.push(new Token(TokenType.EMPTY_STATEMENT, "NOTHING HERE"));
+                    tokenStack.push(new Token(token, string));
+                    source = new StringBuilder(result.replaceFirst("").strip());
                     break;
                 }
             }
@@ -56,8 +65,45 @@ public class TripleStackTokenizer implements Tokenizer {
             }
         }
         if (tokenStack.top().type() == TokenType.KEYWORD_COMPOUND)
-            tokenStack.push(new Token(TokenType.EMPTY, "NOTHING HERE"));
+            tokenStack.push(new Token(TokenType.EMPTY_STATEMENT, "NOTHING HERE"));
         return tokenStack;
+    }
+
+    private void transformSequenceToPrefixDefaultTokenToResult(Token current, TokenStack stack) {
+        stack.push(current);
+    }
+
+    private void transformSequenceToPrefixCommaToken(TokenStack auxStack, TokenStack resultStack) {
+        while ((!auxStack.isEmpty())
+               && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
+               && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
+            resultStack.push(auxStack.pop());
+        }
+    }
+
+    private void transformSequenceToPrefixCompoundToken(Token current, TokenStack auxStack, TokenStack resultStack) {
+        while ((!auxStack.isEmpty())
+               && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
+               && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
+            resultStack.push(auxStack.pop());
+        }
+        if (!auxStack.isEmpty() && auxStack.top().type() == TokenType.KEYWORD_COMPOUND)
+            resultStack.push(auxStack.pop());
+        auxStack.push(current);
+    }
+
+    private void transformSequenceToPrefixOpenParenToken(TokenStack auxStack, TokenStack resultStack) throws TokenizerException {
+        while (!auxStack.isEmpty() && auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
+            resultStack.push(auxStack.pop());
+        if (auxStack.isEmpty())
+            throw new TokenizerException("Unbalanced parentheses -- extra open p.");
+        auxStack.pop();
+    }
+
+    private void transformSequenceToPrefixOperationToken(Token current, TokenStack auxStack, TokenStack resultStack) {
+        while (!auxStack.isEmpty() && auxStack.top().type().compare(current.type()))
+            resultStack.push(auxStack.pop());
+        auxStack.push(current);
     }
 
     private TokenStack transformSequenceToPrefix(TokenStack inputStack) throws TokenizerException {
@@ -66,13 +112,7 @@ public class TripleStackTokenizer implements Tokenizer {
         while (!inputStack.isEmpty()) {
             Token current = inputStack.pop();
             switch (current.type()) {
-                case COMMA -> {
-                    while ((!auxStack.isEmpty())
-                            && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
-                            && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
-                        resultStack.push(auxStack.pop());
-                    }
-                }
+                case COMMA -> transformSequenceToPrefixCommaToken(auxStack, resultStack);
                 case IDENTIFIER,
                         CONST_BOOLEAN,
                         CONST_INTEGER,
@@ -82,7 +122,7 @@ public class TripleStackTokenizer implements Tokenizer {
                         TYPE_STR,
                         TYPE_REF,
                         KEYWORD_HEAP_READ,
-                        EMPTY -> resultStack.push(current);
+                        EMPTY_STATEMENT -> transformSequenceToPrefixDefaultTokenToResult(current, resultStack);
                 case CLOSED_PARENTHESIS,
                         KEYWORD_PRINT,
                         KEYWORD_BRANCH,
@@ -93,35 +133,15 @@ public class TripleStackTokenizer implements Tokenizer {
                         KEYWORD_READ_FILE,
                         KEYWORD_OPEN_FILE,
                         KEYWORD_HEAP_ALLOC,
-                        KEYWORD_HEAP_WRITE -> auxStack.push(current);
-
-                case KEYWORD_COMPOUND -> {
-                    while ((!auxStack.isEmpty())
-                            && (auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
-                            && (auxStack.top().type() != TokenType.KEYWORD_COMPOUND)) {
-                        resultStack.push(auxStack.pop());
-                    }
-                    if (!auxStack.isEmpty() && auxStack.top().type() == TokenType.KEYWORD_COMPOUND)
-                        resultStack.push(auxStack.pop());
-                    auxStack.push(current);
-                }
-                case OPEN_PARENTHESIS -> {
-                    while (!auxStack.isEmpty() && auxStack.top().type() != TokenType.CLOSED_PARENTHESIS)
-                        resultStack.push(auxStack.pop());
-                    if (auxStack.isEmpty())
-                        throw new TokenizerException("Unbalanced parentheses -- extra open p.");
-                    auxStack.pop();
-                }
+                        KEYWORD_HEAP_WRITE -> transformSequenceToPrefixDefaultTokenToResult(current, auxStack);
+                case KEYWORD_COMPOUND -> transformSequenceToPrefixCompoundToken(current, auxStack, resultStack);
+                case OPEN_PARENTHESIS -> transformSequenceToPrefixOpenParenToken(auxStack, resultStack);
                 case EXP_OP,
                         MUL_DIV_OP,
                         ADD_SUB_OP,
                         ASSIGNMENT_OP,
                         RELATIONAL_OP,
-                        LOGICAL_OP -> {
-                    while (!auxStack.isEmpty() && auxStack.top().type().compare(current.type()))
-                        resultStack.push(auxStack.pop());
-                    auxStack.push(current);
-                }
+                        LOGICAL_OP -> transformSequenceToPrefixOperationToken(current, auxStack, resultStack);
             }
         }
         while (!auxStack.isEmpty()) {
@@ -131,4 +151,5 @@ public class TripleStackTokenizer implements Tokenizer {
         }
         return resultStack;
     }
+
 }

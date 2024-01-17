@@ -1,36 +1,30 @@
-package interpreter.view;
+package interpreter.view.graphic;
 
-import inputmanager.InputManager;
-import inputmanager.StringToStatementConverter;
 import inputmanager.parser.ParseException;
 import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
 import interpreter.model.exceptions.*;
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.values.Value;
-import javafx.application.Application;
+import interpreter.repository.RepositoryException;
+import interpreter.view.utils.SourceGenerator;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static interpreter.view.SourceGenerator.CODE;
+import static interpreter.view.utils.SourceGenerator.CODE;
 
-public class RequiredGraphicMenu extends Application implements Menu {
+public class RequiredGraphicMenu extends AbstractGraphicMenu {
 
     @SuppressWarnings("unused")
     public static class TableEntry {
@@ -59,12 +53,7 @@ public class RequiredGraphicMenu extends Application implements Menu {
         }
     }
 
-    private static final StringToStatementConverter inputManager = new InputManager();
-    private BorderPane pageLayout;
-    private Scene scene;
-    private static final double pageWidth = 1000;
-    private static final double pageHeight = 600;
-    private static final double defaultSpacing = 5;
+
     private TextField programCounter;
     private ListView<String> programList;
     private ListView<String> outputList;
@@ -73,7 +62,6 @@ public class RequiredGraphicMenu extends Application implements Menu {
     private ListView<String> concurrentThreads;
     private TableView<TableEntry> symbolTable;
     private TableView<TableEntry> heapTable;
-    private final AtomicInteger logFileCounter = new AtomicInteger(1);
     private final List<Controller> controllers = new ArrayList<>();
     private Button stepButton;
 
@@ -90,12 +78,13 @@ public class RequiredGraphicMenu extends Application implements Menu {
         addNodes();
         populateProgramList();
         registerHandlers();
+        programList.requestFocus();
         stage.show();
     }
 
-    private void initNodes() {
-        pageLayout = new BorderPane();
-        scene = new Scene(pageLayout, pageWidth, pageHeight);
+    @Override
+    protected void initNodes() {
+        super.initNodes();
 
         programCounter = new TextField();
         programCounter.setPrefWidth(pageWidth / 4);
@@ -145,32 +134,24 @@ public class RequiredGraphicMenu extends Application implements Menu {
         heapTable.getColumns().addAll(addressColumn, valueColumnForHeap);
     }
 
-    private void addPrograms() {
+    @Override
+    protected void addPrograms() {
         for (String[] source : SourceGenerator.makeList()) {
             Controller controller;
             try {
                 controller = inputManager.program(source[CODE], logFileCounter.getAndIncrement());
             } catch (TypecheckException e) {
-                showErrorMessageBox("Typechecking error: " + e.getMessage());
+                showErrorMessageBox("Typechecking error:\n" + e.getMessage());
                 continue;
             } catch (TokenizerException e) {
-                showErrorMessageBox("Tokenizing error: " + e.getMessage());
+                showErrorMessageBox("Tokenizing error:\n" + e.getMessage());
                 continue;
             } catch (ParseException e) {
-                showErrorMessageBox("Parsing exception: " + e.getMessage());
+                showErrorMessageBox("Parsing exception:\n" + e.getMessage());
                 continue;
             }
             controllers.add(controller);
         }
-    }
-
-    private void setupPage(Stage stage) {
-        stage.setScene(scene);
-        stage.setTitle("Parsr");
-        String src = "images\\icon.png";
-        File file = new File(src);
-        Image icon = new Image(file.toURI().toString());
-        stage.getIcons().add(icon);
     }
 
     private void addNodes() {
@@ -191,7 +172,8 @@ public class RequiredGraphicMenu extends Application implements Menu {
         pageLayout.setCenter(main);
     }
 
-    private void populateProgramList() {
+    @Override
+    protected void populateProgramList() {
         int i = programList.getSelectionModel().getSelectedIndex();
         programList.getItems().clear();
         for (Controller controller : controllers) {
@@ -243,7 +225,7 @@ public class RequiredGraphicMenu extends Application implements Menu {
         concurrentThreads
                 .getItems()
                 .addAll(current
-                        .getPrograms()
+                        .programs()
                         .stream()
                         .map(s -> "Execution thread " + s.getID().toString())
                         .toList());
@@ -268,71 +250,77 @@ public class RequiredGraphicMenu extends Application implements Menu {
         return threadID;
     }
 
-    private void registerHandlers() {
-        programList.setOnMouseClicked(event -> populateThreadList());
-        concurrentThreads.setOnMouseClicked(event -> {
-            int currentController = getCurrentController();
-            if (currentController == -1)
-                return;
-            int currentThread = getCurrentThread();
-            if (currentThread == -1)
-                return;
-            Controller current = controllers.get(currentController);
-            ProgramState selection = current
-                    .getPrograms()
-                    .get(currentThread);
-            updateComponents(selection);
-        });
-        stepButton.setOnAction(event -> {
-            int currentController = getCurrentController();
-            if (currentController == -1)
-                return;
-            int currentThread = getCurrentThread();
-            if (currentThread == -1)
-                return;
-            List<ProgramState> states = controllers.get(currentController).getPrograms();
-            ProgramState selection = states.get(currentThread);
-            ProgramState spawnedProcess = null;
-            try {
-                spawnedProcess = selection.takeOneStep();
-                updateComponents(selection);
-            } catch (SymbolTableException e) {
-                showErrorMessageBox("Symbol table exception -- " + e.getMessage());
-            } catch (StatementException e) {
-                showErrorMessageBox("Statement exception -- " + e.getMessage());
-            } catch (ValueException e) {
-                showErrorMessageBox("Value exception -- " + e.getMessage());
-            } catch (ProgramStateException e) {
-                showErrorMessageBox("Program state exception -- " + e.getMessage());
-            } catch (HeapException e) {
-                showErrorMessageBox("Heap exception -- " + e.getMessage());
-            } catch (ExpressionException e) {
-                showErrorMessageBox("Expression exception -- " + e.getMessage());
-            }
-            controllers.get(currentController).removeCompletedPrograms();
-            if (spawnedProcess != null && !spawnedProcess.getExecutionStack().empty()) {
-                controllers.get(currentController).getPrograms().add(spawnedProcess);
-                populateThreadList();
-                concurrentThreads.getSelectionModel().select(currentThread);
-            }
-            controllers.get(currentController).removeCompletedPrograms();
-            populateThreadList();
-            controllers.get(currentController).collectGarbage();
-            if (controllers.get(currentController).getPrograms().isEmpty()) {
-                controllers.remove(currentController);
-                populateProgramList();
-                populateThreadList();
-                if (!programList.getItems().isEmpty()) {
-                    programList.getSelectionModel().select(0);
-                }
-            }
-        });
+    private void updateComponentsOnThreadListAction() {
+        int currentController = getCurrentController();
+        if (currentController == -1)
+            return;
+        int currentThread = getCurrentThread();
+        if (currentThread == -1)
+            return;
+        updateComponents(controllers.get(currentController).programs().get(currentThread));
     }
 
-    private static void showErrorMessageBox(String warning) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setContentText(warning);
-        alert.showAndWait();
+    private void executeAStepAndUpdate() {
+        int currentController = getCurrentController();
+        if (currentController == -1)
+            return;
+        int currentThread = getCurrentThread();
+        if (currentThread == -1)
+            return;
+        Controller current = controllers.get(currentController);
+        ProgramState selection = current.programs().get(currentThread);
+        ProgramState spawnedProcess = null;
+        try {
+            spawnedProcess = selection.takeOneStep();
+            updateComponents(selection);
+        } catch (SymbolTableException e) {
+            showErrorMessageBox("Symbol table exception:\n" + e.getMessage());
+        } catch (StatementException e) {
+            showErrorMessageBox("Statement exception:\n" + e.getMessage());
+        } catch (ValueException e) {
+            showErrorMessageBox("Value exception:\n" + e.getMessage());
+        } catch (ProgramStateException e) {
+            showErrorMessageBox("Program state exception -- " + e.getMessage());
+        } catch (HeapException e) {
+            showErrorMessageBox("Heap exception:\n" + e.getMessage());
+        } catch (ExpressionException e) {
+            showErrorMessageBox("Expression exception:\n" + e.getMessage());
+        }
+        try {
+            current.log(selection);
+        } catch (RepositoryException e) {
+            throw new RuntimeException("VERY STRANGE AND UNEXPECTED REPOSITORY EXCEPTION:\n" + e.getMessage() + "\n"
+                                       + "Did you just change something in the project structure? ,':-\\");
+        }
+        current.removeCompletedPrograms();
+        if (spawnedProcess != null && !spawnedProcess.getExecutionStack().empty()) {
+            current.programs().add(spawnedProcess);
+        }
+        current.removeCompletedPrograms();
+        current.collectGarbage();
+        if (current.programs().isEmpty()) {
+            controllers.remove(currentController);
+        }
+        populateProgramList();
+        if (programList.getItems().size() > currentController) {
+            programList.getSelectionModel().select(currentController);
+        } else if (!programList.getItems().isEmpty()) {
+            programList.getSelectionModel().select(programList.getItems().size() - 1);
+        }
+        populateThreadList();
+        if (concurrentThreads.getItems().size() > currentThread) {
+            concurrentThreads.getSelectionModel().select(currentThread);
+        } else {
+            concurrentThreads.getSelectionModel().select(concurrentThreads.getItems().size() - 1);
+        }
     }
+
+    @Override
+    protected void registerHandlers() {
+        programList.setOnMouseClicked(event -> populateThreadList());
+        concurrentThreads.setOnMouseClicked(event -> updateComponentsOnThreadListAction());
+        stepButton.setOnAction(event -> executeAStepAndUpdate());
+    }
+
+
 }

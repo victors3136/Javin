@@ -5,11 +5,13 @@ import inputmanager.tokenizer.Token;
 import java.util.ArrayDeque;
 import java.util.EmptyStackException;
 
-public class TokenStack implements Stack<Token>{
+public class TokenStack implements Stack<Token> {
     final ArrayDeque<Token> storage;
-    public TokenStack(){
+
+    public TokenStack() {
         storage = new ArrayDeque<>();
     }
+
     @Override
     public Stack<Token> push(Token token) {
         storage.push(token);
@@ -30,14 +32,16 @@ public class TokenStack implements Stack<Token>{
     public Token pop() throws EmptyStackException {
         return storage.pop();
     }
+
     @Override
-    public void clear(){
+    public void clear() {
         this.storage.clear();
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder buffer = new StringBuilder();
-        for(Token t: storage){
+        for (Token t : storage) {
             buffer.append(t.sequence()).append(" ");
         }
         return buffer.toString();

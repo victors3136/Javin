@@ -1,4 +1,4 @@
-package interpreter.view;
+package interpreter.view.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -192,6 +192,19 @@ public class SourceGenerator {
                                 """
                 }
         );
+//        This will yield a typecheck error!!!
+//        list.add(new String[]
+//                {
+//                        "gc"
+//                        ,
+//                        """
+//                                ref bool a;
+//                                heap_alloc(a, 10); <-- <-- <-- this line specifically
+//                                heap_alloc(a, 11);
+//                                print("Done")
+//                                """
+//                }
+//        );
         return list;
     }
 }

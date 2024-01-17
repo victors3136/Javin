@@ -1,4 +1,4 @@
-package interpreter.view;
+package interpreter.view.text.commands;
 
 public abstract class Command {
     private final String key;

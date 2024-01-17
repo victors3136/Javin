@@ -30,7 +30,7 @@ public enum TokenType {
     KEYWORD_CLOSE_FILE,
     IDENTIFIER,
     COMMA,
-    EMPTY;
+    EMPTY_STATEMENT;
 
     @Override
     public String toString() {
@@ -64,7 +64,7 @@ public enum TokenType {
             case KEYWORD_CLOSE_FILE -> "close_file";
             case IDENTIFIER -> "variable_name";
             case COMMA -> " , ";
-            case EMPTY -> "∅";
+            case EMPTY_STATEMENT -> "∅";
         };
     }
 
@@ -99,7 +99,7 @@ public enum TokenType {
             case KEYWORD_CLOSE_FILE -> "^fclose\\b";
             case IDENTIFIER -> "^[a-zA-Z_][a-zA-Z_0-9]*";
             case COMMA -> "^,";
-            case EMPTY -> "^$";
+            case EMPTY_STATEMENT -> "(^$)|(^@)";
         };
     }
 

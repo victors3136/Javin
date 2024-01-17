@@ -1,7 +1,6 @@
-package interpreter.view.commands;
+package interpreter.view.text.commands;
 
 import interpreter.controller.Controller;
-import interpreter.view.Command;
 
 public class RunProgramCommand extends Command {
     private final Controller controller;

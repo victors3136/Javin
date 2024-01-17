@@ -76,7 +76,7 @@ public class RecursiveDescentParser implements Parser {
                 next();
                 return new ForkStatement(statement());
             }
-            case EMPTY -> {
+            case EMPTY_STATEMENT -> {
                 next();
                 return new NoOperationStatement();
             }

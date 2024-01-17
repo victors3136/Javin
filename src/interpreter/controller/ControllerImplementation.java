@@ -140,7 +140,12 @@ public class ControllerImplementation implements Controller {
     }
 
     @Override
-    public List<ProgramState> getPrograms() {
+    public List<ProgramState> programs() {
         return repository.getProgramList();
+    }
+
+    @Override
+    public void log(ProgramState toLog) throws RepositoryException {
+        repository.logProgramStateExecution(toLog);
     }
 }

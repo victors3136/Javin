@@ -1,4 +1,5 @@
 package interpreter.model.statements;
+
 import interpreter.model.programstate.ProgramState;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.type.Type;
@@ -20,7 +21,7 @@ public class NoOperationStatement implements Statement {
     }
 
     @Override
-    public String toString(){
-        return " ";
+    public String toString() {
+        return " do_nothing";
     }
 }

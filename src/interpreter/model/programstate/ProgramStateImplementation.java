@@ -9,7 +9,6 @@ import interpreter.model.heaptable.HeapHashTable;
 import interpreter.model.heaptable.HeapTable;
 import interpreter.model.outputlist.OutputList;
 import interpreter.model.outputlist.OutputListArray;
-import interpreter.model.statements.NoOperationStatement;
 import interpreter.model.statements.Statement;
 import interpreter.model.symboltable.SymbolTable;
 import interpreter.model.symboltable.SymbolTableHashMap;
@@ -29,7 +28,7 @@ public class ProgramStateImplementation implements ProgramState {
     private HeapTable heapTable;
 
     public ProgramStateImplementation(Statement originalProgram) {
-        synchronized(LOCK){
+        synchronized (LOCK) {
             this.id = ID_GENERATOR++;
         }
         this.symbolTable = new SymbolTableHashMap<>();
@@ -37,12 +36,11 @@ public class ProgramStateImplementation implements ProgramState {
         this.outputList = new OutputListArray<>();
         this.fileTable = new FileTableMap();
         this.heapTable = new HeapHashTable();
-        this.executionStack.push(new NoOperationStatement());
         this.executionStack.push(originalProgram);
     }
 
     private ProgramStateImplementation(Statement target, SymbolTable<String, Value> symbolTable, HeapTable heapTable, FileTable fileTable, OutputList<Value> outputList) {
-        synchronized(LOCK){
+        synchronized (LOCK) {
             this.id = ID_GENERATOR++;
         }
         this.symbolTable = symbolTable.deepCopy();
@@ -50,7 +48,6 @@ public class ProgramStateImplementation implements ProgramState {
         this.fileTable = fileTable;
         this.outputList = outputList;
         this.executionStack = new ExecutionStackDeque<>();
-        this.executionStack.push(new NoOperationStatement());
         this.executionStack.push(target);
     }
 

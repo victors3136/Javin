@@ -1,6 +1,4 @@
-package interpreter.view.commands;
-
-import interpreter.view.Command;
+package interpreter.view.text.commands;
 
 public class ExitCommand extends Command {
     public ExitCommand(String key, String description){

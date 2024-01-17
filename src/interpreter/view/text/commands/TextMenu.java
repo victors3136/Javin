@@ -1,23 +1,23 @@
-package interpreter.view;
+package interpreter.view.text.commands;
 
+import inputmanager.StringAndStatementInputManager;
 import inputmanager.InputManager;
-import inputmanager.StringToStatementConverter;
 import inputmanager.parser.ParseException;
 import inputmanager.tokenizer.TokenizerException;
 import interpreter.controller.Controller;
 import interpreter.model.exceptions.TypecheckException;
-import interpreter.view.commands.ExitCommand;
-import interpreter.view.commands.RunProgramCommand;
+import interpreter.view.Menu;
+import interpreter.view.utils.SourceGenerator;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static interpreter.view.SourceGenerator.CODE;
+import static interpreter.view.utils.SourceGenerator.CODE;
 
 @SuppressWarnings("unused")
 public class TextMenu implements Menu {
-    private static final StringToStatementConverter inputManager = new InputManager();
+    private static final InputManager inputManager = new StringAndStatementInputManager();
     private final Map<String, Command> commands;
 
     public TextMenu() {
