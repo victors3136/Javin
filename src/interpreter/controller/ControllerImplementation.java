@@ -25,6 +25,7 @@ public class ControllerImplementation implements Controller {
 
     @Override
     public void takeOneStepForAll(List<ProgramState> inputList) {
+        prepareExecutor();
         inputList.forEach(program -> {
             try {
                 repository.logProgramStateExecution(program);
@@ -144,8 +145,9 @@ public class ControllerImplementation implements Controller {
         return repository.getProgramList();
     }
 
-    @Override
-    public void log(ProgramState toLog) throws RepositoryException {
-        repository.logProgramStateExecution(toLog);
+
+    private void prepareExecutor() {
+        if (executor == null)
+            executor = Executors.newFixedThreadPool(2);
     }
 }

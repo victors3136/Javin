@@ -39,7 +39,7 @@ public class TextMenu implements Menu {
 
     private void setup() {
         this.addCommand("exit", new ExitCommand("exit", "exit"));
-        List<String[]> sources = SourceGenerator.makeList();
+        List<String[]> sources = SourceGenerator.makeStrings();
         AtomicInteger counter = new AtomicInteger(1);
         for (String[] source : sources) {
             Controller controller;

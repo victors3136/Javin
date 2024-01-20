@@ -1,7 +1,6 @@
 package interpreter.controller;
 
 import interpreter.model.programstate.ProgramState;
-import interpreter.repository.RepositoryException;
 
 import java.util.List;
 
@@ -20,6 +19,5 @@ public interface Controller {
     void collectGarbage();
 
     List<ProgramState> programs();
-    public void log(ProgramState toLog) throws RepositoryException;
 }
 

@@ -1,5 +1,10 @@
 package interpreter.view.utils;
 
+import interpreter.model.expressions.ValueExpression;
+import interpreter.model.statements.PrintStatement;
+import interpreter.model.statements.Statement;
+import interpreter.model.values.StringValue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +16,7 @@ public class SourceGenerator {
     }
 
 
-    static public List<String[]> makeList() {
+    static public List<String[]> makeStrings() {
         List<String[]> list = new ArrayList<>();
         list.add(new String[]
                 {
@@ -166,7 +171,8 @@ public class SourceGenerator {
                                 print(heap_read(counter))
                                 """
                 }
-        );list.add(new String[]
+        );
+        list.add(new String[]
                 {
                         "concurrency2"
                         ,
@@ -205,6 +211,12 @@ public class SourceGenerator {
 //                                """
 //                }
 //        );
+        return list;
+    }
+
+    public static List<Statement> makeDirectStatements() {
+        List<Statement> list = new ArrayList<>();
+        list.add(new PrintStatement(new ValueExpression(new StringValue("Hello world!"))));
         return list;
     }
 }

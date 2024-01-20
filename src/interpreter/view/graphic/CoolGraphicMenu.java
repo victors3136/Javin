@@ -97,7 +97,7 @@ public class CoolGraphicMenu extends AbstractGraphicMenu {
         spinningCube = new Box();
         spinningSphere = new Sphere();
         spinningCylinder = new Cylinder();
-        sources = SourceGenerator.makeList();
+        sources = SourceGenerator.makeStrings();
     }
 
     private HBox setupHeader() {
