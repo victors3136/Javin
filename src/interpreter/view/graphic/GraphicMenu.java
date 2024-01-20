@@ -278,6 +278,9 @@ public class GraphicMenu extends AbstractGraphicMenu {
         controller.collectGarbage();
         if (controller.programs().isEmpty()) {
             controllers.remove(controllerID);
+            if(controllers.isEmpty()){
+                stepButton.setDisable(true);
+            }
             populateProgramList();
             concurrentThreads.getItems().clear();
             return;

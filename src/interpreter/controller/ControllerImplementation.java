@@ -35,7 +35,7 @@ public class ControllerImplementation implements Controller {
         });
         List<Callable<ProgramState>> callList = inputList
                 .stream()
-                .map(program -> (Callable<ProgramState>) (program::takeOneStep)) /// How to handle excepts here?
+                .map(program -> (Callable<ProgramState>) (program::takeOneStep))
                 .toList();
         List<ProgramState> newList;
         try {
