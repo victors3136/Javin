@@ -39,12 +39,13 @@ public class ArithmeticExpression implements Expression {
             Additive secondValue = (Additive) secondExpression.evaluate(state);
             return (Value) firstValue.add(secondValue);
         }
+        Numeric firstValue = (Numeric) firstExpression.evaluate(state);
         Numeric secondValue = (Numeric) secondExpression.evaluate(state);
         return switch (operand) {
-            case SUB -> (Value) secondValue.sub(secondValue);
-            case DIV -> (Value) secondValue.div(secondValue);
-            case MUL -> (Value) secondValue.mul(secondValue);
-            case EXP -> (Value) secondValue.exp(secondValue);
+            case SUB -> (Value) firstValue.sub(secondValue);
+            case DIV -> (Value) firstValue.div(secondValue);
+            case MUL -> (Value) firstValue.mul(secondValue);
+            case EXP -> (Value) firstValue.exp(secondValue);
             default -> null;
         };
     }
