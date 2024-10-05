@@ -14,6 +14,3 @@ Should be in a fully functional state by February 2024, after the end of the sem
  - Concurrency (fork)  
  - Typechecking (done at parsing rather than at runtime)  
  - GUI using JavaFX (add, edit, execute and even debug code in a GUI)  
-
-*Up next:*  
- - Final Exam Requirement
